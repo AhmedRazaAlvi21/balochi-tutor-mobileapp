@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "976605774309",
+    "project_id": "balochi-tutor",
+    "storage_bucket": "balochi-tutor.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976605774309:android:48b5779219c35414286f0c",
+        "android_client_info": {
+          "package_name": "com.example.balochi_tutor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "976605774309-thpsf5v6agqt4v1vnvbdgsu4bbpjet8o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.balochi_tutor",
+            "certificate_hash": "4bc827eae570aa4543681b3f5671ba5fa36ffc85"
+          }
+        },
+        {
+          "client_id": "976605774309-uehklv5uv65dmedo70eld9pf91rc6h76.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.balochi_tutor",
+            "certificate_hash": "449ab557f97bd4ad203a63dd716cae637d12c081"
+          }
+        },
+        {
+          "client_id": "976605774309-osn433cf7o72d1kg4tind6l8isfb3sm5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALZZK2ezObGCObmYyfcxrRCgJa_AJzQc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "976605774309-osn433cf7o72d1kg4tind6l8isfb3sm5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
