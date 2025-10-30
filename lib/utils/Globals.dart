@@ -1,4 +1,4 @@
-int? userId;
-bool? isUserEnableThePin;
-String? fcmToken;
-String? byReferralCode;
+// int? userId;
+// bool? isUserEnableThePin;
+// String? fcmToken;
+// String? byReferralCode;

@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:get/get.dart';
 
-import '../../../main.dart';
+import '../../../controllers/course_controller/course_controller.dart';
 import '../../../res/assets/image_assets.dart';
 import '../../../res/components/SearchDropdown/SearchDropdownTextField.dart';
 import '../../../res/components/app_assets_image.dart';
@@ -22,17 +22,27 @@ class LessonScreen extends StatefulWidget {
 }
 
 class _LessonScreenState extends State<LessonScreen> {
+  final CourseController courseController = Get.find<CourseController>();
   @override
   void initState() {
     super.initState();
     _secureScreen();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      courseController.getLessonDaysData(context, widget.courseId ?? 0);
+      if (widget.courseId != null) {
+        courseController.isLessonDayDataFetched.value = false;
+        courseController.getLessonDaysData(context, widget.courseId!);
+      }
     });
   }
 
   Future<void> _secureScreen() async {
     await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
+
+  @override
+  void dispose() {
+    courseController.isLessonDayDataFetched.value = false;
+    super.dispose();
   }
 
   @override
@@ -62,20 +72,73 @@ class _LessonScreenState extends State<LessonScreen> {
 
             if (courseController.errorMessage.isNotEmpty) {
               return Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.r)),
                   child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('No courses available at this time.'),
-                  TextButton(
-                      style: ButtonStyle(),
-                      onPressed: () async {
-                        courseController.isLessonDayDataFetched.value = false;
-                        await courseController.getLessonDaysData(context, widget.courseId ?? 0);
-                      },
-                      child: Text('Retry'))
-                ],
-              ));
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.lock, size: 60, color: Colors.black),
+                          SizedBox(width: 5.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 10),
+                                Text(
+                                  'You Need to Clear Quiz',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  courseController.errorMessage.value ?? "",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                SizedBox(height: 20.h),
+                                InkWell(
+                                  onTap: () {
+                                    Get.toNamed(RouteName.quizScreen);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 6.h),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: AppColor.gradientButton,
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16.r),
+                                    ),
+                                    child: Text(
+                                      'Quiz',
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
             final lessons = courseController.filteredLesson.isNotEmpty
@@ -144,7 +207,7 @@ class _LessonScreenState extends State<LessonScreen> {
                       return ListView.builder(
                         itemCount: lessons.length,
                         itemBuilder: (context, index) {
-                          final lesson = lessons[index]; // ✅ use filtered list
+                          final lesson = lessons[index];
                           final status = courseController.getLessonStatus(lesson, index);
                           return Container(
                             margin: EdgeInsets.symmetric(vertical: 6),
@@ -163,17 +226,12 @@ class _LessonScreenState extends State<LessonScreen> {
                             child: ListTile(
                               onTap: () {
                                 print("lesson id ========================== ${lesson.id}");
-
-                                if (status == "none") {
-                                  _showQuizRequiredDialog(context);
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LessonContentScreen(lessonId: lesson.id),
-                                    ),
-                                  );
-                                }
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LessonContentScreen(lessonId: lesson.id),
+                                  ),
+                                );
                               },
                               contentPadding: const EdgeInsets.only(left: 12, right: 12),
                               leading: AppAssetsImage(
@@ -184,14 +242,14 @@ class _LessonScreenState extends State<LessonScreen> {
                                 height: 20.h,
                               ),
                               title: Text(
-                                lesson.title ?? "",
+                                "Lesson ${lesson.order}",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16.sp,
                                 ),
                               ),
                               subtitle: Text(
-                                lesson.description ?? "",
+                                lesson.title ?? "",
                                 style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
                               ),
                               trailing: _buildStatusButton(status),

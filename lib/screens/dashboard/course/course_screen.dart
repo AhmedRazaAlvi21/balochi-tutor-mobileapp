@@ -9,24 +9,34 @@ import '../../../res/assets/image_assets.dart';
 import '../../../res/components/SearchDropdown/SearchDropdownTextField.dart';
 import 'lesson_screen.dart';
 
-class CourseScreen extends StatelessWidget {
+class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final CourseController courseController = Get.put(CourseController());
+  State<CourseScreen> createState() => _CourseScreenState();
+}
 
-    // ✅ Fetch data when the screen first loads
+class _CourseScreenState extends State<CourseScreen> {
+  final CourseController courseController = Get.put(CourseController());
+  bool isNavigating = false;
+
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       courseController.getCourseDayData(context);
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          "Courses",
+          "Course",
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.w700,
@@ -35,77 +45,80 @@ class CourseScreen extends StatelessWidget {
         ),
         automaticallyImplyLeading: false,
       ),
-      body: Obx(() {
-        if (courseController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (courseController.errorMessage.isNotEmpty) {
-          return Center(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('No courses available at this time.'),
-              TextButton(
-                  style: ButtonStyle(),
-                  onPressed: () async {
-                    courseController.isCourseDayDataFetched.value = false;
-                    await courseController.getCourseDayData(context);
-                  },
-                  child: Text('Retry'))
-            ],
-          ));
-        }
-
-        final courseList = courseController.filteredCourse.isNotEmpty
-            ? courseController.filteredCourse
-            : (courseController.courseDayData ?? []);
-
-        if (courseList.isEmpty) {
-          return const Center(child: Text('No courses available'));
-        }
-
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
-          child: Column(
-            children: [
-              SearchDropDownTextField(
-                contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
-                hintText: "Choose course",
-                borderColor: AppColor.whiteColor,
-                fillColor: AppColor.whiteColor,
-                dropDownButton: Icon(
-                  Icons.arrow_drop_down_outlined,
-                  size: 20.sp,
-                  color: AppColor.greyColor,
-                ),
-                items: (filter, _) {
-                  final list = courseController.courseDayData.value ?? [];
-                  final allTitles = list
-                      .where((c) => c.title?.toLowerCase().contains(filter.toLowerCase()) ?? false)
-                      .map((c) => c.title ?? "")
-                      .toList();
-                  if (!allTitles.contains("All Courses")) {
-                    allTitles.insert(0, "All Courses");
-                  }
-                  return allTitles;
-                },
-                onChange: (value) {
-                  if (value == "All Courses" || value.isEmpty) {
-                    // ✅ Show full list again
-                    courseController.filteredCourse.clear();
-                  } else {
-                    // ✅ Apply filter
-                    courseController.selectCourse(value);
-                    courseController.onSearchCourse(value);
-                  }
-                },
-                validator: (value) => value != null && value.isNotEmpty ? null : "Please select a course",
+      body: Column(
+        children: [
+          // 🔍 Search Dropdown
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w) + EdgeInsets.only(bottom: 12.h),
+            child: SearchDropDownTextField(
+              contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
+              hintText: "Choose day",
+              borderColor: AppColor.whiteColor,
+              fillColor: AppColor.whiteColor,
+              dropDownButton: Icon(
+                Icons.arrow_drop_down_outlined,
+                size: 20.sp,
+                color: AppColor.greyColor,
               ),
-              SizedBox(height: 10.h),
-              Expanded(
-                child: RefreshIndicator(
+              items: (filter, _) {
+                final list = courseController.courseDayData ?? [];
+                final allTitles = list
+                    .where((c) => "day ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase()))
+                    .map((c) => "Day ${c.dayNumber}")
+                    .toList();
+
+                if (!allTitles.contains("All Days")) {
+                  allTitles.insert(0, "All Days");
+                }
+                return allTitles;
+              },
+              onChange: (value) {
+                if (value == "All Days" || value.isEmpty) {
+                  courseController.filteredCourse.clear();
+                } else {
+                  courseController.selectCourse(value);
+                  courseController.onSearchCourse(value);
+                }
+              },
+              validator: (value) => value != null && value.isNotEmpty ? null : "Please select a course",
+            ),
+          ),
+          Expanded(
+            child: Obx(() {
+              if (courseController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (courseController.errorMessage.isNotEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('No courses available at this time.'),
+                      TextButton(
+                        onPressed: () async {
+                          courseController.isCourseDayDataFetched.value = false;
+                          await courseController.getCourseDayData(context);
+                        },
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              final courseList = courseController.filteredCourse.isNotEmpty
+                  ? courseController.filteredCourse
+                  : (courseController.courseDayData ?? []);
+
+              if (courseList.isEmpty) {
+                return const Center(child: Text('No courses available'));
+              }
+
+              // ✅ ListView.builder wrapped in GetBuilder for efficient rebuild
+              return GetBuilder<CourseController>(
+                id: "course_list",
+                builder: (_) => RefreshIndicator(
                   color: AppColor.primaryColor,
                   onRefresh: () async {
                     courseController.isCourseDayDataFetched.value = false;
@@ -114,32 +127,43 @@ class CourseScreen extends StatelessWidget {
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: courseList.length,
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
                     itemBuilder: (context, index) {
                       final course = courseList[index];
+
+                      // ❌ remove continuous prints
+                      // print only once if needed
+                      debugPrint("Course ID: ${course.id}");
+
                       return InkWell(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          if (isNavigating) return;
+                          isNavigating = true;
+
+                          await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => LessonScreen(courseId: course.id ?? 0)),
+                            MaterialPageRoute(
+                              builder: (context) => LessonScreen(courseId: course.id ?? 0),
+                            ),
                           );
+
+                          isNavigating = false;
                         },
                         child: CourseCardWidget(
                           done: false,
-                          title: course.title ?? 'Unknown Day',
-                          subTitle: 'Balochi',
-                          lesson: course.description ?? '',
+                          title: "Day ${course.dayNumber}",
+                          subTitle: course.title ?? 'Balochi',
                           image: ImageAssets.courseImage,
                         ),
                       );
                     },
                   ),
                 ),
-              ),
-            ],
+              );
+            }),
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 }

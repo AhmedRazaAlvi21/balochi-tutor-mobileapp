@@ -127,12 +127,14 @@ class CourseController extends GetxController {
     final query = selectedCourse?.toLowerCase() ?? courseSearchController.text.toLowerCase();
     final allCourses = courseDayData;
     if (query.isNotEmpty) {
-      filteredCourse.value =
-          allCourses.where((course) => course.title?.toLowerCase().contains(query) ?? false).toList();
+      filteredCourse.value = allCourses.where((course) {
+        final dayString = "day ${course.dayNumber}".toLowerCase();
+        return dayString.contains(query);
+      }).toList();
     } else {
       filteredCourse.value = allCourses;
     }
-    update();
+    update(['course_list']);
   }
 
   void onSearchLesson([String? selectedLesson]) {
@@ -148,9 +150,10 @@ class CourseController extends GetxController {
   }
 
   Future<void> getCourseDayData(BuildContext context, [int? courseId]) async {
-    if (isCourseDayDataFetched.value) return;
     try {
       isLoading.value = true;
+      update(['loading', 'course_list']); // 🔹 triggers partial rebuilds
+
       errorMessage.value = '';
       final id = courseId ?? profileController.dashboardData.value?.course?.id ?? 0;
       debugPrint("✅ dashboard Course ID: ================$id");
@@ -158,7 +161,6 @@ class CourseController extends GetxController {
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         courseDayData.value = response.responseData?.data ?? [];
         filteredCourse.value = courseDayData; // Reset filtered list after data is fetched
-        isCourseDayDataFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
         debugPrint("⚠️ Failed to fetch course data: ${errorMessage.value}");
@@ -168,26 +170,25 @@ class CourseController extends GetxController {
       debugPrint("❌ Exception in getCourseDayData: $e");
     } finally {
       isLoading.value = false;
+      update(['loading', 'course_list']);
     }
   }
 
-  Future<void> getLessonDaysData(BuildContext context, int courseId) async {
-    if (isLessonDayDataFetched.value) return;
+  Future<void> getLessonDaysData(BuildContext context, int courseId, {bool forceRefresh = false}) async {
+    if (isLessonDayDataFetched.value && !forceRefresh) return;
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      debugPrint("✅ Lesson Days data fetched successfully for course ID: $courseId");
+      debugPrint("✅ Lesson Days data fetched for course ID: $courseId");
       final response = await LessonDaysService().callLessonDaysService(context, courseId);
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         lessonDaysData.value = response.responseData?.data ?? [];
         isLessonDayDataFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
-        debugPrint("⚠️ Failed to fetch lesson data: ${errorMessage.value}");
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      debugPrint("❌ Exception in getLessonDaysData: $e");
     } finally {
       isLoading.value = false;
     }

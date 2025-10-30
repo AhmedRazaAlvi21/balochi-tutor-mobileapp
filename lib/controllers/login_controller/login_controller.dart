@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../auth_repository/social_auth_repository.dart';
 import '../../main.dart';
-import '../../repository/auth_repository/social_auth_repository.dart';
 import '../../res/routes/routes_name.dart';
 import '../../service/auth_service/login-service.dart';
 import '../../service/auth_service/social_login_service.dart';

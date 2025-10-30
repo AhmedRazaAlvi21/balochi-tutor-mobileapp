@@ -59,12 +59,11 @@ class MyApp extends StatelessWidget {
           child: GetMaterialApp(
             title: 'app_name'.tr,
             debugShowCheckedModeBanner: false,
-            theme: ThemeData.light().copyWith(
-              timePickerTheme: TimePickerThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0.r), // Use ScreenUtil
-                ),
-                dialHandColor: AppColor.primaryColor,
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AppColor.primaryColor,
+                surfaceTint: Colors.transparent,
               ),
               primaryColor: AppColor.primaryColor,
               textTheme: GoogleFonts.nunitoTextTheme(

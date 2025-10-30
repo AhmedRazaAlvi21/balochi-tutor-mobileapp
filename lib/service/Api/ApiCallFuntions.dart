@@ -47,7 +47,6 @@ class Api {
             ("${e.response!.data['message']}".toLowerCase() == "invalid auth token!" ||
                 e.response!.data["statusCode"] == 404)) {
           SharedPreferencesService().remove(KeysConstant.accessToken);
-          SharedPreferencesService().remove(KeysConstant.userId);
           Navigator.of(context).pushNamedAndRemoveUntil(RouteName.loginScreen, (route) => false, arguments: {
             "comeFromPinCode": false,
             "showMessage": true,
