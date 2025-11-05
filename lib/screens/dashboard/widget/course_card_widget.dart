@@ -13,8 +13,10 @@ class CourseCardWidget extends StatelessWidget {
   final String? lesson;
   final String? words;
   final String? image;
+  final bool? isLocked;
 
-  const CourseCardWidget({super.key, this.done, this.title, this.subTitle, this.lesson, this.words, this.image});
+  const CourseCardWidget(
+      {super.key, this.done, this.title, this.subTitle, this.lesson, this.words, this.image, this.isLocked});
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +34,20 @@ class CourseCardWidget extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: AppAssetsImage(
-                      imagePath: image ?? ImageAssets.courseImage,
-                      height: 100.h,
-                      width: 100.w,
-                    )),
-                Positioned(
-                    top: 10, bottom: 0, left: 10, right: 0, child: AppAssetsImage(imagePath: ImageAssets.playIcon))
+                  borderRadius: BorderRadius.circular(12),
+                  child: AppAssetsImage(
+                    imagePath: image ?? ImageAssets.courseImage,
+                    height: 100.h,
+                    width: 100.w,
+                  ),
+                ),
+                AppAssetsImage(
+                  imagePath: isLocked == true ? ImageAssets.lockIcon : ImageAssets.playIcon,
+                  height: isLocked == true ? 45.h : 80.h,
+                  width: isLocked == true ? 45.w : 80.w,
+                  color: isLocked == true ? AppColor.primary2 : null,
+                  fit: BoxFit.contain,
+                ),
               ],
             ),
             SizedBox(width: 10),

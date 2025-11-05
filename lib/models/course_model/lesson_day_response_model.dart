@@ -67,6 +67,7 @@ class LessonDaysData {
   String? createdAt;
   String? updatedAt;
   CourseDay? courseDay;
+  bool? isCompleted;
 
   LessonDaysData(
       {this.id,
@@ -88,7 +89,8 @@ class LessonDaysData {
       this.voiceRomanMakrani,
       this.createdAt,
       this.updatedAt,
-      this.courseDay});
+      this.courseDay,
+      this.isCompleted});
 
   LessonDaysData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -111,6 +113,7 @@ class LessonDaysData {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     courseDay = json['course_day'] != null ? CourseDay.fromJson(json['course_day']) : null;
+    isCompleted = json['is_completed'];
   }
 
   Map<String, dynamic> toJson() {
@@ -137,6 +140,7 @@ class LessonDaysData {
     if (courseDay != null) {
       data['course_day'] = courseDay!.toJson();
     }
+    data['is_completed'] = isCompleted;
     return data;
   }
 }

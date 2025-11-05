@@ -1,16 +1,20 @@
 import 'package:balochi_tutor/models/course_model/course_days_resposne_model.dart';
 import 'package:balochi_tutor/models/course_model/get_lesson_completed_reponse_model.dart';
 import 'package:balochi_tutor/models/course_model/lesson_day_response_model.dart';
+import 'package:balochi_tutor/res/colors/app_color.dart';
+import 'package:balochi_tutor/res/components/custom_text.dart';
 import 'package:balochi_tutor/service/course_service/course_day_service.dart';
 import 'package:balochi_tutor/service/course_service/get_lesson_completed_service.dart';
 import 'package:balochi_tutor/service/course_service/lesson_completed_service.dart';
 import 'package:balochi_tutor/service/course_service/lesson_days_service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
 import '../../main.dart';
 import '../../models/course_model/lesson_content_response_model.dart';
+import '../../res/components/custom_rounded_button.dart';
 import '../../res/routes/routes_name.dart';
 import '../../service/course_service/lesson_content_service.dart';
 import '../../utils/utils.dart';
@@ -36,6 +40,7 @@ class CourseController extends GetxController {
   var selectedBalochiType = "Sulemani Balochi".obs;
   var isSpeaking = false.obs;
   var quizId = 0;
+  bool hasFetchedCompletedLessons = false;
 
   @override
   void onInit() {
@@ -75,7 +80,7 @@ class CourseController extends GetxController {
       } else if (responseData?.quiz != null) {
         quizId = responseData?.quiz?.id ?? 0;
         errorMessage.value = "You must complete the quiz for this day before accessing lessons";
-        debugPrint("⚠️ Quiz required with ID: $quizId");
+        debugPrint("Quiz required with ID: $quizId");
       } else {
         errorMessage.value = responseData?.message ?? 'Something went wrong';
       }
@@ -180,15 +185,14 @@ class CourseController extends GetxController {
   Future<void> getCourseDayData(BuildContext context, [int? courseId]) async {
     try {
       isLoading.value = true;
-      update(['loading', 'course_list']); // 🔹 triggers partial rebuilds
-
+      update(['loading', 'course_list']);
       errorMessage.value = '';
       final id = courseId ?? profileController.dashboardData.value?.course?.id ?? 0;
       debugPrint("✅ dashboard Course ID: ================$id");
       final response = await CourseDayService().callCourseDayService(context, id);
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         courseDayData.value = response.responseData?.data ?? [];
-        filteredCourse.value = courseDayData; // Reset filtered list after data is fetched
+        filteredCourse.value = courseDayData;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
         debugPrint("⚠️ Failed to fetch course data: ${errorMessage.value}");
@@ -231,14 +235,60 @@ class CourseController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
       final response = await LessonCompletedService().callLessonCompletedService(context, lessonId, body);
+
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
-        Utils.toastMessage(context, "${response.responseData?.message}", true);
-        Future.delayed(const Duration(seconds: 2), () {
-          Get.offAllNamed(RouteName.lessonCompleteScreen);
-        });
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: CustomText(
+                  title: "🎉 Congratulations!",
+                  textalign: TextAlign.center,
+                  fontweight: FontWeight.bold,
+                  fontsize: 20.sp),
+              content: CustomText(
+                  title: "You’ve successfully completed this lesson. Would you like to see all your completed lessons?",
+                  textalign: TextAlign.left,
+                  fontcolor: AppColor.blackColor,
+                  fontsize: 16.sp),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomRoundButton(
+                        height: 35.h,
+                        buttonColor: AppColor.whiteColor,
+                        textColor: AppColor.blackColor,
+                        onPress: () {
+                          Get.back();
+                          Get.back();
+                        },
+                        title: "Back",
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: CustomRoundButton(
+                        height: 35.h,
+                        onPress: () {
+                          Get.back();
+                          Get.offAllNamed(RouteName.lessonCompleteScreen);
+                        },
+                        title: "Next",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
       } else {
-        errorMessage.value = response.responseData?.message ?? 'Failed to fetch lesson completed';
-        Utils.toastMessage(context, "${response.responseData?.message}", true);
+        errorMessage.value = response.responseData?.message ?? 'Failed to complete lesson';
+        Utils.toastMessage(context, errorMessage.value, true);
       }
     } catch (e) {
       errorMessage.value = e.toString();

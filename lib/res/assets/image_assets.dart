@@ -47,4 +47,6 @@ class ImageAssets {
   static const String leftFlower = 'assets/images/left_flower.svg';
   static const String warning = 'assets/icons/warning.svg';
   static const String cup = 'assets/images/cup.svg';
+  static const String doneGroup = 'assets/icons/donegroup.png';
+  static const String lockIcon = 'assets/icons/lockIcon.png';
 }

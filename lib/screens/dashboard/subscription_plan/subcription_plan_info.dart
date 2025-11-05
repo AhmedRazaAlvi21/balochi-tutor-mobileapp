@@ -8,7 +8,6 @@ import '../../../res/colors/app_color.dart';
 import '../../../res/components/app_assets_image.dart';
 import '../../../res/components/custom_rounded_button.dart';
 import '../../../res/components/custom_text.dart';
-import '../../../res/routes/routes_name.dart';
 
 class SubscriptionPlanInfo extends StatelessWidget {
   const SubscriptionPlanInfo({super.key});
@@ -216,7 +215,6 @@ class SubscriptionPlanInfo extends StatelessWidget {
                                               context: context,
                                               paymentSource: controller.selectedImages.keys.first,
                                             );
-                                            Get.toNamed(RouteName.paymentSuccessful);
                                           },
                                         ),
                                       ),

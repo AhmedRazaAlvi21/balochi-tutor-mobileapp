@@ -1,4 +1,5 @@
 import 'package:balochi_tutor/res/colors/app_color.dart';
+import 'package:balochi_tutor/res/components/custom_text.dart';
 import 'package:balochi_tutor/screens/dashboard/course/lesson_details/lesson_content_screen.dart';
 import 'package:balochi_tutor/screens/dashboard/quiz/quiz_screen.dart';
 import 'package:flutter/material.dart';
@@ -80,61 +81,7 @@ class _LessonScreenState extends State<LessonScreen> {
             }
 
             if (courseController.errorMessage.isNotEmpty) {
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
-                    decoration: BoxDecoration(color: AppColor.whiteColor, borderRadius: BorderRadius.circular(8.r)),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.lock, size: 60, color: Colors.black),
-                            SizedBox(width: 5.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'You Need to Clear Quiz',
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Text(
-                                    courseController.errorMessage.value ?? "",
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.h),
-                                  GradientButtonWidget(
-                                    width: 150.w,
-                                    padding: EdgeInsets.zero,
-                                    title: "Quiz",
-                                    onTap: () {
-                                      Get.to(() => QuizScreen(quizId: courseController.quizId));
-                                    },
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return showQuizWidget();
             }
             final lessons = courseController.filteredLesson.isNotEmpty
                 ? courseController.filteredLesson
@@ -181,78 +128,82 @@ class _LessonScreenState extends State<LessonScreen> {
                   ),
                   SizedBox(height: 10.h),
                   Expanded(
-                    child: Obx(() {
-                      if (courseController.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        // Force API to refetch fresh data
+                        await courseController.getLessonDaysData(context, widget.courseId!, forceRefresh: true);
+                      },
+                      child: Obx(() {
+                        if (courseController.isLoading.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
 
-                      if (courseController.errorMessage.isNotEmpty) {
-                        return Center(child: Text(courseController.errorMessage.value));
-                      }
+                        if (courseController.errorMessage.isNotEmpty) {
+                          return Center(child: Text(courseController.errorMessage.value));
+                        }
 
-                      // ✅ use filteredLesson if available
-                      final lessons = courseController.filteredLesson.isNotEmpty
-                          ? courseController.filteredLesson
-                          : courseController.lessonDaysData;
+                        final lessons = courseController.filteredLesson.isNotEmpty
+                            ? courseController.filteredLesson
+                            : courseController.lessonDaysData;
 
-                      if (lessons.isEmpty) {
-                        return const Center(child: Text('No lessons found'));
-                      }
+                        if (lessons.isEmpty) {
+                          return const Center(child: Text('No lessons found'));
+                        }
 
-                      return ListView.builder(
-                        itemCount: lessons.length,
-                        itemBuilder: (context, index) {
-                          final lesson = lessons[index];
-                          final status = courseController.getLessonStatus(lesson, index);
-                          return Container(
-                            margin: EdgeInsets.symmetric(vertical: 6),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.white,
-                              border: status == "resume" ? Border.all(color: Colors.deepPurple, width: 1.5) : null,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: ListTile(
-                              onTap: () {
-                                print("lesson id ========================== ${lesson.id}");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LessonContentScreen(lessonId: lesson.id),
+                        return ListView.builder(
+                          itemCount: lessons.length,
+                          itemBuilder: (context, index) {
+                            final lesson = lessons[index];
+                            final status = lesson.isCompleted;
+                            return Container(
+                              margin: EdgeInsets.symmetric(vertical: 6),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white,
+                                border: status == "resume" ? Border.all(color: Colors.deepPurple, width: 1.5) : null,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 2),
                                   ),
-                                );
-                              },
-                              contentPadding: const EdgeInsets.only(left: 12, right: 12),
-                              leading: AppAssetsImage(
-                                imagePath: ImageAssets.pencilPaper,
-                                fit: BoxFit.scaleDown,
-                                color: status == "resume" ? null : AppColor.black72C,
-                                width: 18.w,
-                                height: 20.h,
+                                ],
                               ),
-                              title: Text(
-                                "Lesson ${lesson.order}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16.sp,
+                              child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LessonContentScreen(lessonId: lesson.id),
+                                    ),
+                                  );
+                                },
+                                contentPadding: const EdgeInsets.only(left: 12, right: 12),
+                                leading: AppAssetsImage(
+                                  imagePath: ImageAssets.pencilPaper,
+                                  fit: BoxFit.scaleDown,
+                                  color: status == "resume" ? null : AppColor.black72C,
+                                  width: 18.w,
+                                  height: 20.h,
                                 ),
+                                title: Text(
+                                  "Lesson ${lesson.order}",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  lesson.title ?? "",
+                                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+                                ),
+                                trailing: _buildStatusButton(status ?? false),
                               ),
-                              subtitle: Text(
-                                lesson.title ?? "",
-                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
-                              ),
-                              trailing: _buildStatusButton(status),
-                            ),
-                          );
-                        },
-                      );
-                    }),
+                            );
+                          },
+                        );
+                      }),
+                    ),
                   ),
                 ],
               ),
@@ -263,62 +214,121 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
-  Widget _buildStatusButton(String status) {
-    switch (status) {
-      case "resume":
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: LinearGradient(
-                  colors: AppColor.appPrimaryGradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+  Center showQuizWidget() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
+          decoration: BoxDecoration(color: AppColor.whiteColor, borderRadius: BorderRadius.circular(8.r)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.lock, size: 60, color: Colors.black),
+                  SizedBox(width: 5.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 10),
+                        CustomText(
+                          title: 'You Need to Clear Quiz',
+                          fontcolor: AppColor.blackColor,
+                          fontsize: 16.sp,
+                          fontweight: FontWeight.w700,
+                        ),
+                        CustomText(
+                          title: courseController.errorMessage.value ?? "",
+                          fontcolor: AppColor.blackColor,
+                          fontsize: 14.sp,
+                          fontweight: FontWeight.w400,
+                        ),
+                        SizedBox(height: 20.h),
+                        GradientButtonWidget(
+                          width: 150.w,
+                          padding: EdgeInsets.zero,
+                          title: "Quiz",
+                          onTap: () {
+                            Get.to(() => QuizScreen(quizId: courseController.quizId));
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
-              child: const Text(
-                "Resume From Last",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 10,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: AppColor.black121),
-          ],
-        );
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-      case "completed":
+  Widget _buildStatusButton(bool status) {
+    switch (status) {
+      // case "resume":
+      //   return Row(
+      //     mainAxisSize: MainAxisSize.min,
+      //     children: [
+      //       Container(
+      //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      //         decoration: BoxDecoration(
+      //           borderRadius: BorderRadius.circular(8),
+      //           gradient: LinearGradient(
+      //             colors: AppColor.appPrimaryGradient,
+      //             begin: Alignment.topLeft,
+      //             end: Alignment.bottomRight,
+      //           ),
+      //         ),
+      //         child: const Text(
+      //           "Resume From Last",
+      //           style: TextStyle(
+      //             color: Colors.white,
+      //             fontWeight: FontWeight.w700,
+      //             fontSize: 10,
+      //           ),
+      //         ),
+      //       ),
+      //       const SizedBox(width: 8),
+      //       const Icon(Icons.chevron_right, color: AppColor.black121),
+      //     ],
+      //   );
+
+      case true:
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(25.r),
                 border: Border.all(color: AppColor.black121),
               ),
               child: Row(
-                children: const [
-                  Icon(Icons.verified, color: Colors.green),
-                  SizedBox(width: 4),
+                children: [
+                  AppAssetsImage(
+                    imagePath: ImageAssets.doneGroup,
+                    fit: BoxFit.scaleDown,
+                    width: 20.w,
+                    height: 20.h,
+                  ),
+                  SizedBox(width: 4.w),
                   Text(
                     "Completed",
                     style: TextStyle(
                       color: AppColor.black121,
                       fontWeight: FontWeight.w400,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
             const Icon(Icons.chevron_right, color: AppColor.black121),
           ],
         );

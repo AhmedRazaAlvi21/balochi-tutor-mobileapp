@@ -112,7 +112,7 @@ class QuizScreen extends StatelessWidget {
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
-                      dropdownColor: const Color(0xFFEDE8FF),
+                      dropdownColor: AppColor.primaryColor,
                       borderRadius: BorderRadius.circular(16.r),
                       value: controller.selectedType.value.isEmpty ? null : controller.selectedType.value,
                       hint: Text(
@@ -142,7 +142,7 @@ class QuizScreen extends StatelessWidget {
                                   type,
                                   style: TextStyle(
                                     color: AppColor.whiteColor,
-                                    fontSize: 14.sp,
+                                    fontSize: 16.sp,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),

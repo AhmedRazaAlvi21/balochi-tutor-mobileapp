@@ -24,7 +24,10 @@ class _CourseScreenState extends State<CourseScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      courseController.getCourseDayData(context);
+      // Only fetch if course list is empty
+      if (courseController.courseDayData.isEmpty) {
+        courseController.getCourseDayData(context);
+      }
     });
   }
 
@@ -85,11 +88,11 @@ class _CourseScreenState extends State<CourseScreen> {
           ),
           Expanded(
             child: Obx(() {
-              if (courseController.isLoading.value) {
+              if (courseController.isLoading.value && courseController.courseDayData.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (courseController.errorMessage.isNotEmpty) {
+              if (courseController.errorMessage.isNotEmpty && courseController.courseDayData.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -97,7 +100,6 @@ class _CourseScreenState extends State<CourseScreen> {
                       const Text('No courses available at this time.'),
                       TextButton(
                         onPressed: () async {
-                          courseController.isCourseDayDataFetched.value = false;
                           await courseController.getCourseDayData(context);
                         },
                         child: const Text('Retry'),
@@ -114,8 +116,6 @@ class _CourseScreenState extends State<CourseScreen> {
               if (courseList.isEmpty) {
                 return const Center(child: Text('No courses available'));
               }
-
-              // ✅ ListView.builder wrapped in GetBuilder for efficient rebuild
               return GetBuilder<CourseController>(
                 id: "course_list",
                 builder: (_) => RefreshIndicator(
@@ -130,11 +130,8 @@ class _CourseScreenState extends State<CourseScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 12.w),
                     itemBuilder: (context, index) {
                       final course = courseList[index];
-
-                      // ❌ remove continuous prints
-                      // print only once if needed
                       debugPrint("Course ID: ${course.id}");
-
+                      debugPrint("Course isLocked: ${course.isLocked}");
                       return InkWell(
                         onTap: () async {
                           if (isNavigating) return;
@@ -147,6 +144,7 @@ class _CourseScreenState extends State<CourseScreen> {
                           title: "Day ${course.dayNumber}",
                           subTitle: course.title ?? 'Balochi',
                           image: ImageAssets.courseImage,
+                          isLocked: course.isLocked,
                         ),
                       );
                     },

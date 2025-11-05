@@ -13,15 +13,11 @@ class QuizController extends GetxController {
   var errorMessage = ''.obs;
 
   var currentQuestionIndex = 0.obs;
-  var selectedIndex = RxnInt(); // For current question visual highlight
+  var selectedIndex = RxnInt();
   final List<String> quizTypes = ["sulemani", "makrani"];
   var selectedType = ''.obs;
-
-  /// Map to hold all selected answers
-  /// e.g. { "23": 2, "24": 1, "25": "asa" }
   Map<String, dynamic> answers = {};
 
-  /// --- Fetch quiz data ---
   Future<void> getQuizData(BuildContext context, int quizId, String selectedType) async {
     try {
       if (selectedType.isEmpty) {
@@ -29,12 +25,9 @@ class QuizController extends GetxController {
             backgroundColor: Colors.redAccent, colorText: Colors.white);
         return;
       }
-
       isLoading.value = true;
       errorMessage.value = '';
-
       final response = await QuizQuestionService().callQuizQuestionService(context, quizId, selectedType);
-
       if (response.responseData != null && response.responseData?.quiz != null) {
         quizData.value = response.responseData!.quiz!;
       } else {
@@ -47,17 +40,12 @@ class QuizController extends GetxController {
     }
   }
 
-  /// --- Select option for a question ---
   void selectOption(int questionId, dynamic answerValue, int optionIndex) {
-    // Save selected answer
     answers[questionId.toString()] = answerValue;
-
-    // Update selected index (for UI highlight)
     selectedIndex.value = optionIndex;
     update();
   }
 
-  /// --- Go to next question ---
   void nextQuestion() {
     if (currentQuestionIndex.value < (quizData.value?.questions?.length ?? 0) - 1) {
       currentQuestionIndex.value++;
@@ -67,7 +55,6 @@ class QuizController extends GetxController {
     }
   }
 
-  /// --- Reset quiz state ---
   void resetQuiz() {
     currentQuestionIndex.value = 0;
     selectedIndex.value = null;
@@ -75,36 +62,28 @@ class QuizController extends GetxController {
     answers.clear();
   }
 
-  /// --- Set quiz type ---
   void setQuizType(String type) {
     selectedType.value = type;
   }
 
-  /// --- Submit Quiz API Call ---
   Future<void> submitQuiz(BuildContext context) async {
     try {
       if (quizData.value == null) {
         Get.snackbar("Error", "No quiz data available.");
         return;
       }
-
       if (answers.isEmpty) {
         Get.snackbar("Error", "Please answer all questions before submitting.");
         return;
       }
-
       isLoading.value = true;
-
       final requestModel = SubmitQuizRequestModel(
         quizId: quizData.value!.id ?? 0,
         type: selectedType.value,
         answers: answers,
       );
-
       debugPrint("Submit Quiz Request: ${requestModel.toJson()}");
-
       final response = await SubmitQuizService().callSubmitQuizService(context, requestModel);
-
       if (response.responseData?.success == true && response.responseData?.code == 200) {
         final result = response.responseData?.data;
         final String? score = result?.score;
@@ -112,14 +91,16 @@ class QuizController extends GetxController {
         final double scoreValue = double.tryParse(score?.replaceAll('%', '') ?? '0') ?? 0;
         final int totalQuestions = quizData.value?.questions?.length ?? 0;
         final int correctAnswers = ((scoreValue / 100) * totalQuestions).round();
-        Get.off(() => ResultScreen(
-              score: scoreValue.toStringAsFixed(0), // pass as string for UI
-              passed: passed ?? false,
-              totalQuestions: totalQuestions,
-              correctAnswers: correctAnswers,
-            ));
+        Get.off(
+          () => ResultScreen(
+            score: scoreValue.toStringAsFixed(0),
+            passed: passed ?? false,
+            totalQuestions: totalQuestions,
+            correctAnswers: correctAnswers,
+          ),
+        );
+        resetQuiz();
       } else {
-
         Get.snackbar("Error", "Failed to submit quiz.");
       }
     } catch (e) {

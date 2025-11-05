@@ -43,6 +43,7 @@ class CourseDaysData {
   String? audio;
   String? createdAt;
   String? updatedAt;
+  bool? isLocked;
 
   CourseDaysData(
       {this.id,
@@ -56,7 +57,8 @@ class CourseDaysData {
       this.video,
       this.audio,
       this.createdAt,
-      this.updatedAt});
+      this.updatedAt,
+      this.isLocked});
 
   CourseDaysData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -71,6 +73,7 @@ class CourseDaysData {
     audio = json['audio'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    isLocked = json['is_locked'];
   }
 
   Map<String, dynamic> toJson() {
@@ -87,6 +90,7 @@ class CourseDaysData {
     data['audio'] = audio;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
+    data['is_locked'] = isLocked;
     return data;
   }
 }

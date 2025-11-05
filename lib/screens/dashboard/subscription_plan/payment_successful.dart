@@ -45,29 +45,27 @@ class PaymentSuccessful extends StatelessWidget {
                       SizedBox(
                         height: context.blockSizeVertical * 10,
                       ),
-                      Card(
+                      Container(
                         margin: EdgeInsets.symmetric(horizontal: 15),
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
+                        decoration:
+                            BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: AppColor.whiteColor),
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 30),
+                              padding: EdgeInsets.symmetric(vertical: 30.r),
                               child: CustomPaint(
                                 painter: RPSCustomPainter(),
                                 child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 25.0,
-                                    right: 20.0,
-                                    left: 20.0,
-                                    top: 10.0,
+                                  padding: EdgeInsets.only(
+                                    bottom: 25.h,
+                                    right: 50.w,
+                                    left: 50.w,
+                                    top: 10.h,
                                   ),
                                   child: CustomText(
                                     title: 'complete_payment_text1'.tr,
                                     fontcolor: AppColor.blackColor,
-                                    fontsize: 18,
+                                    fontsize: 18.sp,
                                     fontweight: FontWeight.w700,
                                   ),
                                 ),
@@ -96,7 +94,7 @@ class PaymentSuccessful extends StatelessWidget {
                               ),
                               child: CustomText(
                                 title:
-                                    "You have successfully subscribed to Balochi tutor for ${premiumController.monthPlan}. We will always remind you before the subscription expires. Enjoy the benefits",
+                                    "You have successfully subscribed to Balochi Tutor for ${premiumController.monthPlan}. We will always remind you before the subscription expires. Enjoy the benefits.",
                                 fontcolor: AppColor.blackColor,
                                 textalign: TextAlign.left,
                                 fontsize: 16.sp,

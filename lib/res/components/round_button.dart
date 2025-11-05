@@ -29,18 +29,7 @@ class RoundButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-        // MaterialButton(
-        //   onPressed: onPress,
-        //   child: loading
-        //       ? Center(child: CircularProgressIndicator())
-        //       : Center(child: text),
-        //   color: buttonColor,
-        //   height: height,
-        //   minWidth: width,
-        //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        // );
-        InkWell(
+    return InkWell(
       onTap: onPress,
       child: Container(
         height: height,

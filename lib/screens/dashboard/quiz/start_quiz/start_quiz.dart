@@ -47,13 +47,13 @@ class StartQuiz extends StatelessWidget {
 
           if (controller.errorMessage.isNotEmpty) {
             return Center(
-              child: Text(controller.errorMessage.value, style: const TextStyle(color: Colors.red)),
+              child: Text("No quiz data found", style: const TextStyle(color: Colors.red)),
             );
           }
 
           final quiz = controller.quizData.value;
           if (quiz == null || quiz.questions == null || quiz.questions!.isEmpty) {
-            return const Center(child: Text("No quiz data found"));
+            return const Center(child: Text("No Quiz Found"));
           }
 
           final currentQuestion = quiz.questions![controller.currentQuestionIndex.value];

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../res/routes/routes_name.dart';
 import '../../service/payment_process_service/payment_process_service.dart';
 
 class PremiumController extends GetxController {
@@ -24,34 +25,40 @@ class PremiumController extends GetxController {
         'id': 1,
         'duration': '1 Month',
         'discount': 'Get over 10% off',
-        'price': '\$10.00',
+        'price': '2,800',
       },
       {
         'id': 2,
         'duration': '3 Months',
         'discount': 'Get over 20% off',
-        'price': '\$26.00',
+        'price': '7,300',
       },
       {
         'id': 3,
         'duration': '6 Months',
         'discount': 'Get over 30% off',
-        'price': '\$46.00',
+        'price': '13,000',
       },
       {
         'id': 4,
         'duration': '12 Months',
         'discount': 'Get over 40% off',
-        'price': '\$86.00',
+        'price': '24,000',
       },
     ];
   }
 
   Future<void> pickImageFromGallery(String methodName) async {
+    debugPrint("📸 Opening gallery...");
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    debugPrint("✅ Gallery closed");
+
     if (pickedFile != null) {
       selectedImages[methodName] = File(pickedFile.path);
       selectedImages.refresh();
+      debugPrint("🖼️ Image selected: ${pickedFile.path}");
+    } else {
+      debugPrint("⚠️ No image selected");
     }
   }
 
@@ -99,15 +106,18 @@ class PremiumController extends GetxController {
 
       isLoading(false);
 
-      if (response.responseData?.code == 200) {
+      if (response.responseData?.code == 200 && response.responseData?.success == true) {
         Get.snackbar(
           "Payment Confirmed",
           "Your payment for ${monthPlan.value} plan has been successfully submitted.",
           backgroundColor: Colors.white,
         );
+        debugPrint("response.message true============= ${response.message}");
+        Get.toNamed(RouteName.paymentSuccessful);
         clearSelectedImage(paymentSource);
       } else {
         Get.snackbar("Failed", response.message ?? "Something went wrong");
+        debugPrint("response.message false ============= ${response.message}");
       }
     } catch (e) {
       isLoading(false);
