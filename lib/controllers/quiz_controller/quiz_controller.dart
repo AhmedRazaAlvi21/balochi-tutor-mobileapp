@@ -119,6 +119,7 @@ class QuizController extends GetxController {
               correctAnswers: correctAnswers,
             ));
       } else {
+
         Get.snackbar("Error", "Failed to submit quiz.");
       }
     } catch (e) {
