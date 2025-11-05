@@ -6,12 +6,13 @@ import '../Api/ApiCallExceptions.dart';
 import '../Api/ApiCallFuntions.dart';
 import '../Api/ApiCallResponse.dart';
 
-class GetQuizService {
-  Future<ApiCallResponse<GetQuizResponseModel>> callGetQuizService(BuildContext context, int id, String type) async {
+class QuizQuestionService {
+  Future<ApiCallResponse<QuizQuestionsResponseModel>> callQuizQuestionService(
+      BuildContext context, int id, String type) async {
     try {
       var response = await Api().getRequest(context, "${AppUrl.quizApi}/$id/$type/questions", sendToken: true);
       debugPrint("Quiz Response: $response");
-      GetQuizResponseModel responseModel = GetQuizResponseModel.fromJson(response);
+      QuizQuestionsResponseModel responseModel = QuizQuestionsResponseModel.fromJson(response);
       debugPrint("Quiz Response Model: ${responseModel.toJson()}");
       return ApiCallResponse.completed(responseModel);
     } on BadRequestException {

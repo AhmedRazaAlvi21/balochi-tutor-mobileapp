@@ -19,9 +19,6 @@ import '../../screens/dashboard/course/lesson_details/lesson_complete_screen.dar
 import '../../screens/dashboard/course/lesson_details/lesson_content_screen.dart';
 import '../../screens/dashboard/course/lesson_screen.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
-import '../../screens/dashboard/quiz/quiz_screen.dart';
-import '../../screens/dashboard/quiz/start_quiz/quiz_fill_the_blanks.dart';
-import '../../screens/dashboard/quiz/start_quiz/start_quiz.dart';
 import '../../screens/dashboard/setting/about/about_screen.dart';
 import '../../screens/dashboard/setting/about/privacy_policy_screen.dart';
 import '../../screens/dashboard/setting/about/subscription_info_screen.dart';
@@ -61,9 +58,6 @@ class AppRoutes {
         GetPage(name: RouteName.subscriptionPlan, page: () => SubscriptionPlan()),
         GetPage(name: RouteName.subscriptionPlanInfo, page: () => SubscriptionPlanInfo()),
         GetPage(name: RouteName.paymentSuccessful, page: () => PaymentSuccessful()),
-        GetPage(name: RouteName.quizScreen, page: () => QuizScreen()),
-        GetPage(name: RouteName.startQuiz, page: () => StartQuiz()),
-        GetPage(name: RouteName.quizFillTheBlanks, page: () => QuizFillTheBlanks()),
         //GetPage(name: RouteName.resultScreen, page: () => ResultScreen()),
       ];
 }

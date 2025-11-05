@@ -1,11 +1,11 @@
-class GetQuizResponseModel {
+class QuizQuestionsResponseModel {
   bool? success;
   Quiz? quiz;
   int? code;
 
-  GetQuizResponseModel({this.success, this.quiz, this.code});
+  QuizQuestionsResponseModel({this.success, this.quiz, this.code});
 
-  GetQuizResponseModel.fromJson(Map<String, dynamic> json) {
+  QuizQuestionsResponseModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     quiz = json['quiz'] != null ? Quiz.fromJson(json['quiz']) : null;
     code = json['code'];
@@ -73,7 +73,7 @@ class Quiz {
     if (json['questions'] != null) {
       questions = <Questions>[];
       json['questions'].forEach((v) {
-        questions!.add(new Questions.fromJson(v));
+        questions!.add(Questions.fromJson(v));
       });
     }
     if (json['fillquestions'] != null) {

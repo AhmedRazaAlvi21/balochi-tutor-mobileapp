@@ -35,6 +35,7 @@ class CourseController extends GetxController {
   var selectedLesson = "".obs;
   var selectedBalochiType = "Sulemani Balochi".obs;
   var isSpeaking = false.obs;
+  var quizId = 0;
 
   @override
   void onInit() {
@@ -56,6 +57,33 @@ class CourseController extends GetxController {
       isSpeaking.value = false;
       print("❌ TTS Error: $msg");
     });
+  }
+
+  Future<void> getLessonDaysData(BuildContext context, int courseId, {bool forceRefresh = false}) async {
+    if (isLessonDayDataFetched.value && !forceRefresh) return;
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      debugPrint("✅ Lesson Days data fetched for course ID: $courseId");
+      final response = await LessonDaysService().callLessonDaysService(context, courseId);
+      final responseData = response.responseData;
+
+      if (responseData?.code == 200 || responseData?.code == 201) {
+        lessonDaysData.value = responseData?.data ?? [];
+        isLessonDayDataFetched.value = true;
+        quizId = 0;
+      } else if (responseData?.quiz != null) {
+        quizId = responseData?.quiz?.id ?? 0;
+        errorMessage.value = "You must complete the quiz for this day before accessing lessons";
+        debugPrint("⚠️ Quiz required with ID: $quizId");
+      } else {
+        errorMessage.value = responseData?.message ?? 'Something went wrong';
+      }
+    } catch (e) {
+      errorMessage.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> fetchCompleteLesson(BuildContext context) async {
@@ -171,26 +199,6 @@ class CourseController extends GetxController {
     } finally {
       isLoading.value = false;
       update(['loading', 'course_list']);
-    }
-  }
-
-  Future<void> getLessonDaysData(BuildContext context, int courseId, {bool forceRefresh = false}) async {
-    if (isLessonDayDataFetched.value && !forceRefresh) return;
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-      debugPrint("✅ Lesson Days data fetched for course ID: $courseId");
-      final response = await LessonDaysService().callLessonDaysService(context, courseId);
-      if (response.responseData?.code == 200 || response.responseData?.code == 201) {
-        lessonDaysData.value = response.responseData?.data ?? [];
-        isLessonDayDataFetched.value = true;
-      } else {
-        errorMessage.value = response.responseData?.message ?? 'Something went wrong';
-      }
-    } catch (e) {
-      errorMessage.value = e.toString();
-    } finally {
-      isLoading.value = false;
     }
   }
 

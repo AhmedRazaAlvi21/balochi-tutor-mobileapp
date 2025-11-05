@@ -6,17 +6,21 @@ import '../../colors/app_color.dart';
 class GradientButtonWidget extends StatelessWidget {
   final Function() onTap;
   final String title;
+  final double? width;
+  final EdgeInsets? padding;
 
   const GradientButtonWidget({
     super.key,
     required this.onTap,
     required this.title,
+    this.width,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 195.w,
+      width: width ?? 195.w,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
             colors: AppColor.gradientButton, begin: Alignment.centerLeft, end: Alignment.centerRight),
@@ -25,7 +29,7 @@ class GradientButtonWidget extends StatelessWidget {
       child: TextButton(
         onPressed: onTap,
         style: TextButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
+          padding: padding ?? EdgeInsets.symmetric(vertical: 12.h),
         ),
         child: Text(
           title,

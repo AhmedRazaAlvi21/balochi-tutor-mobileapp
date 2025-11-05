@@ -1,158 +1,178 @@
-import 'package:balochi_tutor/res/routes/routes_name.dart';
+import 'dart:convert';
+
+import 'package:balochi_tutor/controllers/quiz_controller/quiz_controller.dart';
+import 'package:balochi_tutor/res/colors/app_color.dart';
+import 'package:balochi_tutor/res/components/background_widget.dart';
+import 'package:balochi_tutor/res/components/bottom_sheet_view.dart';
+import 'package:balochi_tutor/res/components/gradientButtonWidget/gradient_button_widget.dart';
+import 'package:balochi_tutor/res/components/gradientButtonWidget/gradient_text_widget.dart';
+import 'package:balochi_tutor/screens/dashboard/quiz/start_quiz/quiz_fill_the_blanks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../../res/colors/app_color.dart';
-import '../../../../res/components/background_widget.dart';
-import '../../../../res/components/bottom_sheet_view.dart';
-import '../../../../res/components/gradientButtonWidget/gradient_button_widget.dart';
-import '../../../../res/components/gradientButtonWidget/gradient_text_widget.dart';
+class StartQuiz extends StatelessWidget {
+  final int quizId;
+  final String selectedType;
 
-class StartQuiz extends StatefulWidget {
-  const StartQuiz({super.key});
+  StartQuiz({super.key, required this.quizId, required this.selectedType});
 
-  @override
-  State<StartQuiz> createState() => _StartQuizState();
-}
-
-class _StartQuizState extends State<StartQuiz> {
-  final List<String> options = [
-    "تو چون ئے؟",
-    "روگ ءَ ئے",
-    "من آں",
-    "تو کجا",
-  ];
-
-  final String correctAnswer = "تو چون ئے؟";
-
-  int? selectedIndex;
+  final QuizController controller = Get.put(QuizController());
 
   @override
   Widget build(BuildContext context) {
+    controller.getQuizData(context, quizId, selectedType);
+
     return BackgroundWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
             "Quiz",
-            style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w700, color: AppColor.black121),
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w700,
+              color: AppColor.black121,
+            ),
           ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: Column(
-          children: [
-            SizedBox(height: 20.h),
-            GradientTextWidget(
-              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
-              child: Text(
-                "How are you?",
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500, color: AppColor.black242),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 15, top: 15),
-                // child: GradientDropdown(
-                //   options: ["Sulemani", "Makrani"],
-                //   initialValue: "Sulemani",
-                // ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 20.h),
-                    SizedBox(
-                      width: MediaQuery.sizeOf(context).width * 0.7,
-                      child: ListView.builder(
-                        itemCount: options.length,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          bool isSelected = selectedIndex == index;
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.only(bottom: 20.h),
-                              child: GradientTextWidget(
-                                width: 160,
-                                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
-                                gradientColors: isSelected
-                                    ? AppColor.gradientButton
-                                    : AppColor.gradientButton.map((color) => color.withOpacity(0.4)).toList(),
-                                child: Text(
-                                  options[index],
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColor.black242,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+          if (controller.errorMessage.isNotEmpty) {
+            return Center(
+              child: Text(controller.errorMessage.value, style: const TextStyle(color: Colors.red)),
+            );
+          }
+
+          final quiz = controller.quizData.value;
+          if (quiz == null || quiz.questions == null || quiz.questions!.isEmpty) {
+            return const Center(child: Text("No quiz data found"));
+          }
+
+          final currentQuestion = quiz.questions![controller.currentQuestionIndex.value];
+          final List<String> options = List<String>.from(json.decode(currentQuestion.options ?? '[]'));
+          final correctIndex = currentQuestion.correctAnswer ?? -1;
+
+          bool isLastQuestion = controller.currentQuestionIndex.value == (quiz.questions!.length - 1);
+
+          // ✅ Change button text dynamically
+          String buttonText =
+              isLastQuestion ? ((quiz.fillquestions?.isNotEmpty ?? false) ? "Next Section" : "Finish") : "Next";
+
+          return Column(
+            children: [
+              SizedBox(height: 20.h),
+              GradientTextWidget(
+                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
+                child: Text(
+                  currentQuestion.question ?? "",
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.black242,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
+              SizedBox(height: 30.h),
 
-            /// Submit Button
-            GradientButtonWidget(
-              title: "Submit",
-              onTap: () {
-                _onCheck(context);
-              },
-            ),
-            SizedBox(height: 30.h),
-          ],
-        ),
+              // --- Options List ---
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(options.length, (index) {
+                      bool isSelected = controller.selectedIndex.value == index;
+                      return GestureDetector(
+                        onTap: () {
+                          int questionId =
+                              controller.quizData.value?.questions?[controller.currentQuestionIndex.value].id ?? 0;
+                          controller.selectOption(
+                            questionId,
+                            index + 1, // the selected answer value (e.g., option number)
+                            index, // to highlight UI
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 30.w),
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 20.h),
+                            child: GradientTextWidget(
+                              width: 230.w,
+                              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
+                              gradientColors: isSelected
+                                  ? AppColor.gradientButton
+                                  : AppColor.gradientButton.map((c) => c.withOpacity(0.4)).toList(),
+                              child: Text(
+                                options[index],
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.black242,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+
+              GradientButtonWidget(
+                title: buttonText,
+                onTap: () {
+                  _onSubmit(context, controller, correctIndex);
+                },
+              ),
+              SizedBox(height: 30.h),
+            ],
+          );
+        }),
       ),
     );
   }
 
-  void _onCheck(BuildContext context) {
-    if (selectedIndex == null) {
-      Get.snackbar(
-        "Select an option",
-        "Please choose an answer before submitting.",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
+  void _onSubmit(BuildContext context, QuizController controller, int correctIndex) {
+    if (controller.selectedIndex.value == null) {
+      Get.snackbar("Select an option", "Please choose an answer before continuing.",
+          backgroundColor: Colors.redAccent, colorText: Colors.white);
       return;
     }
 
-    bool isMatch = options[selectedIndex!] == correctAnswer;
+    bool isCorrect = controller.selectedIndex.value == (correctIndex - 1);
+    final quiz = controller.quizData.value!;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BottomSheetView(
-        color: isMatch ? Colors.green : Colors.red,
-        headertext: isMatch ? 'Correct' : 'Wrong',
-        btntext: isMatch ? 'Next' : 'Again',
+        color: isCorrect ? Colors.green : Colors.red,
+        headertext: isCorrect ? 'Correct' : 'Wrong',
+        btntext: controller.currentQuestionIndex.value == (quiz.questions!.length - 1)
+            ? ((quiz.fillquestions?.isNotEmpty ?? false) ? "Next Section" : "Finish")
+            : "Next",
         btnOntap: () {
           Get.back();
-          if (isMatch) {
-            Get.toNamed(RouteName.quizFillTheBlanks);
+          if (controller.currentQuestionIndex.value < (quiz.questions!.length - 1)) {
+            controller.nextQuestion();
           } else {
-            Get.back();
+            if ((quiz.fillquestions?.isNotEmpty ?? false)) {
+              final fillQuestions = List.from(quiz.fillquestions ?? []);
+              Get.to(() => QuizFillTheBlanks(fillQuestions: fillQuestions));
+            } else {
+              controller.submitQuiz(context);
+            }
           }
-          // Move to next or retry
         },
       ),
     );

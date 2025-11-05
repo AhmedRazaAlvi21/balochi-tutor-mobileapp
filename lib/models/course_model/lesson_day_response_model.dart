@@ -3,30 +3,46 @@ class LessonDaysResponseModel {
   String? message;
   int? code;
   List<LessonDaysData>? data;
+  LessonDayQuiz? quiz;
 
-  LessonDaysResponseModel({this.success, this.message, this.code, this.data});
+  LessonDaysResponseModel({
+    this.success,
+    this.message,
+    this.code,
+    this.data,
+    this.quiz,
+  });
 
   LessonDaysResponseModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
     code = json['code'];
-    if (json['data'] != null) {
+
+    // Handle both possible cases
+    if (json['data'] != null && json['data'] is List) {
       data = <LessonDaysData>[];
       json['data'].forEach((v) {
         data!.add(LessonDaysData.fromJson(v));
       });
     }
+
+    if (json['quiz'] != null && json['quiz'] is Map<String, dynamic>) {
+      quiz = LessonDayQuiz.fromJson(json['quiz']);
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['success'] = success;
-    data['message'] = message;
-    data['code'] = code;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> map = <String, dynamic>{};
+    map['success'] = success;
+    map['message'] = message;
+    map['code'] = code;
+    if (data != null) {
+      map['data'] = data!.map((v) => v.toJson()).toList();
     }
-    return data;
+    if (quiz != null) {
+      map['quiz'] = quiz!.toJson();
+    }
+    return map;
   }
 }
 
@@ -183,5 +199,71 @@ class CourseDay {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     return data;
+  }
+}
+
+class LessonDayQuiz {
+  int? id;
+  String? title;
+  String? description;
+  String? status;
+  String? quizType;
+  int? order;
+  int? dayAfter;
+  int? duration;
+  int? passingScore;
+  String? difficulty;
+  int? questionsCount;
+  String? createdAt;
+  String? updatedAt;
+
+  LessonDayQuiz({
+    this.id,
+    this.title,
+    this.description,
+    this.status,
+    this.quizType,
+    this.order,
+    this.dayAfter,
+    this.duration,
+    this.passingScore,
+    this.difficulty,
+    this.questionsCount,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  LessonDayQuiz.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    title = json['title'];
+    description = json['description'];
+    status = json['status'];
+    quizType = json['quiz_type'];
+    order = json['order'];
+    dayAfter = json['day_after'];
+    duration = json['duration'];
+    passingScore = json['passing_score'];
+    difficulty = json['difficulty'];
+    questionsCount = json['questions_count'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = <String, dynamic>{};
+    map['id'] = id;
+    map['title'] = title;
+    map['description'] = description;
+    map['status'] = status;
+    map['quiz_type'] = quizType;
+    map['order'] = order;
+    map['day_after'] = dayAfter;
+    map['duration'] = duration;
+    map['passing_score'] = passingScore;
+    map['difficulty'] = difficulty;
+    map['questions_count'] = questionsCount;
+    map['created_at'] = createdAt;
+    map['updated_at'] = updatedAt;
+    return map;
   }
 }

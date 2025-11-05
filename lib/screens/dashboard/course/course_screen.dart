@@ -139,14 +139,7 @@ class _CourseScreenState extends State<CourseScreen> {
                         onTap: () async {
                           if (isNavigating) return;
                           isNavigating = true;
-
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LessonScreen(courseId: course.id ?? 0),
-                            ),
-                          );
-
+                          Get.to(() => LessonScreen(courseId: course.id ?? 0));
                           isNavigating = false;
                         },
                         child: CourseCardWidget(

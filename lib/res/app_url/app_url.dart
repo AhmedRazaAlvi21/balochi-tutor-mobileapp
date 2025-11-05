@@ -19,4 +19,5 @@ class AppUrl {
   static const String completedLessons = '/completed/lessons';
   static const String paymentProcess = '/payment/process';
   static const String quizApi = '/quiz';
+  static const String quizSubmit = '/quiz/submit';
 }

@@ -1,7 +1,7 @@
 plugins {
     id "com.android.application"
     // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
+    id "com.google.gms.google-services"
     // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
@@ -9,8 +9,8 @@ plugins {
 
 android {
     namespace = "com.example.balochi_tutor"
-    compileSdk = 35
-    ndkVersion = "25.1.8937393"
+    compileSdk = 36      // ✅ updated for plugin compatibility
+    ndkVersion = "27.0.12077973"   // ✅ updated NDK version
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -24,15 +24,28 @@ android {
 
     defaultConfig {
         applicationId = "com.example.balochi_tutor"
-        minSdk = 23
-        targetSdk = 35
+        minSdkVersion = flutter.minSdkVersion      // ✅ set minimum supported by most Flutter plugins
+        targetSdk = 36          // ✅ match compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled true    // ✅ recommended for large apps or Firebase
     }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += [
+                    "META-INF/LICENSE*",
+                    "META-INF/DEPENDENCIES",
+                    "META-INF/NOTICE*"
+            ]
         }
     }
 }
@@ -42,5 +55,6 @@ flutter {
 }
 
 dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"  // ✅ for multidex
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
 }

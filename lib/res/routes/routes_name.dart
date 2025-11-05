@@ -37,8 +37,5 @@ class RouteName {
   static const String subscriptionPlan = '/subscriptionPlan';
   static const String subscriptionPlanInfo = '/subscriptionPlanInfo';
   static const String paymentSuccessful = '/paymentSuccessful';
-  static const String quizScreen = '/quizScreen';
-  static const String startQuiz = '/startQuiz';
-  static const String quizFillTheBlanks = '/quizFillTheBlanks';
   static const String resultScreen = '/resultScreen';
 }

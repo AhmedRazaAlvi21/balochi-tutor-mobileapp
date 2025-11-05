@@ -1,16 +1,17 @@
 import 'package:balochi_tutor/res/colors/app_color.dart';
-import 'package:balochi_tutor/res/routes/routes_name.dart';
 import 'package:balochi_tutor/screens/dashboard/course/lesson_details/lesson_content_screen.dart';
+import 'package:balochi_tutor/screens/dashboard/quiz/quiz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:get/get.dart';
+import 'package:screen_protector/screen_protector.dart';
 
 import '../../../controllers/course_controller/course_controller.dart';
 import '../../../res/assets/image_assets.dart';
 import '../../../res/components/SearchDropdown/SearchDropdownTextField.dart';
 import '../../../res/components/app_assets_image.dart';
 import '../../../res/components/background_widget.dart';
+import '../../../res/components/gradientButtonWidget/gradient_button_widget.dart';
 
 class LessonScreen extends StatefulWidget {
   final int? courseId;
@@ -23,6 +24,7 @@ class LessonScreen extends StatefulWidget {
 
 class _LessonScreenState extends State<LessonScreen> {
   final CourseController courseController = Get.find<CourseController>();
+
   @override
   void initState() {
     super.initState();
@@ -36,11 +38,18 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> _secureScreen() async {
-    await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+    try {
+      await ScreenProtector.preventScreenshotOn();
+      await ScreenProtector.protectDataLeakageOn(); // Optional (for screen recording)
+    } catch (e) {
+      debugPrint("Screen security error: $e");
+    }
   }
 
   @override
   void dispose() {
+    ScreenProtector.preventScreenshotOff();
+    ScreenProtector.protectDataLeakageOff();
     courseController.isLessonDayDataFetched.value = false;
     super.dispose();
   }
@@ -72,75 +81,61 @@ class _LessonScreenState extends State<LessonScreen> {
 
             if (courseController.errorMessage.isNotEmpty) {
               return Center(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.r)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.lock, size: 60, color: Colors.black),
-                          SizedBox(width: 5.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 10),
-                                Text(
-                                  'You Need to Clear Quiz',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  courseController.errorMessage.value ?? "",
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                SizedBox(height: 20.h),
-                                InkWell(
-                                  onTap: () {
-                                    Get.toNamed(RouteName.quizScreen);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 6.h),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: AppColor.gradientButton,
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(16.r),
-                                    ),
-                                    child: Text(
-                                      'Quiz',
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                      ),
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
+                    decoration: BoxDecoration(color: AppColor.whiteColor, borderRadius: BorderRadius.circular(8.r)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.lock, size: 60, color: Colors.black),
+                            SizedBox(width: 5.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'You Need to Clear Quiz',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
+                                  Text(
+                                    courseController.errorMessage.value ?? "",
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20.h),
+                                  GradientButtonWidget(
+                                    width: 150.w,
+                                    padding: EdgeInsets.zero,
+                                    title: "Quiz",
+                                    onTap: () {
+                                      Get.to(() => QuizScreen(quizId: courseController.quizId));
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
             }
-
             final lessons = courseController.filteredLesson.isNotEmpty
                 ? courseController.filteredLesson
                 : courseController.lessonDaysData;
@@ -331,82 +326,5 @@ class _LessonScreenState extends State<LessonScreen> {
       default:
         return const Icon(Icons.chevron_right, color: AppColor.black121);
     }
-  }
-
-  void _showQuizRequiredDialog(BuildContext context) {
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        backgroundColor: AppColor.whiteColor,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.95,
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.r)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.lock, size: 60, color: Colors.black),
-                  SizedBox(width: 5.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 10),
-                        Text(
-                          'You Need to Clear Quiz',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          'to unlock this lesson.',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        SizedBox(height: 20.h),
-                        InkWell(
-                          onTap: () {
-                            Get.toNamed(RouteName.quizScreen);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 6.h),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: AppColor.gradientButton,
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                              borderRadius: BorderRadius.circular(16.r),
-                            ),
-                            child: Text(
-                              'Quiz',
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-      barrierDismissible: true,
-    );
   }
 }
