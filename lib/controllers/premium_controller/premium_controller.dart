@@ -25,25 +25,25 @@ class PremiumController extends GetxController {
         'id': 1,
         'duration': '1 Month',
         'discount': 'Get over 10% off',
-        'price': '2,800',
+        'price': 'Rs. 2,800',
       },
       {
         'id': 2,
         'duration': '3 Months',
         'discount': 'Get over 20% off',
-        'price': '7,300',
+        'price': 'Rs. 7,300',
       },
       {
         'id': 3,
         'duration': '6 Months',
         'discount': 'Get over 30% off',
-        'price': '13,000',
+        'price': 'Rs. 13,000',
       },
       {
         'id': 4,
         'duration': '12 Months',
         'discount': 'Get over 40% off',
-        'price': '24,000',
+        'price': 'Rs. 24,000',
       },
     ];
   }

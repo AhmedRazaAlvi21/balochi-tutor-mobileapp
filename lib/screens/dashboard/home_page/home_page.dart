@@ -66,10 +66,29 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           CircleAvatar(
                             radius: 25.r,
-                            child: AppAssetsImage(
-                              imagePath: ImageAssets.person2,
-                              fit: BoxFit.scaleDown,
-                            ),
+                            backgroundColor: Colors.white,
+                            child: (dashboardData?.user?.userImg != null && dashboardData!.user!.userImg!.isNotEmpty)
+                                ? ClipOval(
+                                    child: Image.network(
+                                      dashboardData.user!.userImg!,
+                                      fit: BoxFit.cover,
+                                      width: 50.w,
+                                      height: 50.h,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        // If image fails to load
+                                        return Icon(
+                                          Icons.person,
+                                          size: 30.sp,
+                                          color: AppColor.greyColor,
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.person,
+                                    size: 50.sp,
+                                    color: AppColor.greyColor,
+                                  ),
                           ),
                           SizedBox(width: 10.w),
                           Column(
@@ -125,7 +144,8 @@ class _HomePageState extends State<HomePage> {
                     carouselController: _controller,
                     options: CarouselOptions(
                       height: 160.h,
-                      autoPlay: false,
+                      autoPlay: true,
+                      autoPlayAnimationDuration: Duration(seconds: 1),
                       enlargeCenterPage: true,
                       viewportFraction: 0.95,
                       onPageChanged: (index, reason) {
