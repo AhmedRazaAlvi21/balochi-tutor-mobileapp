@@ -1,3 +1,4 @@
+import 'package:balochi_tutor/res/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -76,21 +77,42 @@ class QuizController extends GetxController {
         Get.snackbar("Error", "Please answer all questions before submitting.");
         return;
       }
+
       isLoading.value = true;
+
       final requestModel = SubmitQuizRequestModel(
         quizId: quizData.value!.id ?? 0,
         type: selectedType.value,
         answers: answers,
       );
-      debugPrint("Submit Quiz Request: ${requestModel.toJson()}");
+
+      debugPrint("🟢 Submit Quiz Request Data:");
+      debugPrint("Quiz ID: ${requestModel.quizId}");
+      debugPrint("Type: ${requestModel.type}");
+      debugPrint("Answers: ${requestModel.answers}");
+
       final response = await SubmitQuizService().callSubmitQuizService(context, requestModel);
+
+      // 🔹 Full Response Print
+      debugPrint("🟢 Submit Quiz Full Response: ${response.responseData}");
+
       if (response.responseData?.success == true && response.responseData?.code == 200) {
         final result = response.responseData?.data;
+
+        debugPrint("🟣 Result Data: $result");
+
         final String? score = result?.score;
         final bool? passed = result?.passed;
         final double scoreValue = double.tryParse(score?.replaceAll('%', '') ?? '0') ?? 0;
         final int totalQuestions = quizData.value?.questions?.length ?? 0;
         final int correctAnswers = ((scoreValue / 100) * totalQuestions).round();
+
+        debugPrint("✅ Score: $score");
+        debugPrint("✅ Passed: $passed");
+        debugPrint("✅ Score Value: $scoreValue");
+        debugPrint("✅ Total Questions: $totalQuestions");
+        debugPrint("✅ Correct Answers: $correctAnswers");
+
         Get.off(
           () => ResultScreen(
             score: scoreValue.toStringAsFixed(0),
@@ -99,11 +121,17 @@ class QuizController extends GetxController {
             correctAnswers: correctAnswers,
           ),
         );
+
         resetQuiz();
       } else {
-        Get.snackbar("Error", "Failed to submit quiz.");
+        debugPrint("❌ Quiz submission failed.");
+        debugPrint("Response Code: ${response.responseData?.code}");
+        debugPrint("Response Message: ${response.responseData?.data?.passed}");
+        Get.snackbar("Error", "${response.responseData?.type}",
+            backgroundColor: AppColor.redColor, colorText: AppColor.whiteColor);
       }
     } catch (e) {
+      debugPrint("🔥 Exception in submitQuiz: $e");
       Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;

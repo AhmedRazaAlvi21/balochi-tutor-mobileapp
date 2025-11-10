@@ -31,6 +31,10 @@ class _HomePageState extends State<HomePage> {
       "title": "Practice Daily to Improve",
       "image": "assets/image2.png",
     },
+    {
+      "title": "Practice Daily to Improve",
+      "image": "assets/image2.png",
+    },
   ];
   final ProfileController profileController = Get.put(ProfileController());
 
@@ -170,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                             margin: EdgeInsets.symmetric(horizontal: 4.w),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: _current == entry.key ? Colors.black : Colors.grey.withOpacity(0.4),
+                              color: _current == entry.key ? AppColor.blueColor2 : AppColor.greyEBE,
                             ),
                           ),
                         );
@@ -345,26 +349,32 @@ class _HomePageState extends State<HomePage> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppAssetsImage(
-              imagePath: icon,
-              fit: BoxFit.scaleDown,
-              width: 28.w,
-              height: 28.h,
+            Padding(
+              padding: EdgeInsets.only(top: 5.h),
+              child: AppAssetsImage(
+                imagePath: icon,
+                fit: BoxFit.scaleDown,
+                width: 24.w,
+                height: 24.h,
+              ),
             ),
             SizedBox(width: 5.w),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontSize: quiz ? 14.sp : 18.sp, fontWeight: FontWeight.w700, color: AppColor.black121)),
-                  Text(subTitle,
-                      style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w500, color: AppColor.black161)),
-                ],
+              child: Padding(
+                padding: EdgeInsets.only(top: 5.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(title,
+                        style: TextStyle(
+                            fontSize: quiz ? 14.sp : 18.sp, fontWeight: FontWeight.w700, color: AppColor.black121)),
+                    Text(subTitle,
+                        style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w500, color: AppColor.black161)),
+                  ],
+                ),
               ),
             ),
           ],

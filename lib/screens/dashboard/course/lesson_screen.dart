@@ -160,7 +160,7 @@ class _LessonScreenState extends State<LessonScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.white,
-                                border: status == "resume" ? Border.all(color: Colors.deepPurple, width: 1.5) : null,
+                                //border: status == "resume" ? Border.all(color: Colors.deepPurple, width: 1.5) : null,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.05),
@@ -174,7 +174,8 @@ class _LessonScreenState extends State<LessonScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => LessonContentScreen(lessonId: lesson.id),
+                                      builder: (context) =>
+                                          LessonContentScreen(lessonId: lesson.id, order: lesson.order),
                                     ),
                                   );
                                 },
@@ -182,7 +183,7 @@ class _LessonScreenState extends State<LessonScreen> {
                                 leading: AppAssetsImage(
                                   imagePath: ImageAssets.pencilPaper,
                                   fit: BoxFit.scaleDown,
-                                  color: status == "resume" ? null : AppColor.black72C,
+                                  color: AppColor.black72C,
                                   width: 18.w,
                                   height: 20.h,
                                 ),

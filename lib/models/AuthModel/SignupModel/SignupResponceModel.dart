@@ -14,19 +14,17 @@ class SignupResponseModel {
   });
 
   SignupResponseModel.fromJson(Map<String, dynamic> json) {
-    // For success case
     success = json['success'];
     code = json['code'];
+    error = json['error'];
 
-    // For error case or normal message
+    // ✅ Handle both normal messages and validation maps
     if (json['message'] is String) {
       message = json['message'];
     } else if (json['message'] is Map<String, dynamic>) {
       validationMessage = Map<String, dynamic>.from(json['message']);
+      message = _extractFirstValidationMessage(validationMessage);
     }
-
-    // Error field (e.g. "Validation Error")
-    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -38,16 +36,30 @@ class SignupResponseModel {
     return data;
   }
 
-  /// Helper method to extract readable error (optional)
-  String? getFirstValidationError() {
-    if (validationMessage == null) return null;
-    if (validationMessage!.isNotEmpty) {
-      final firstKey = validationMessage!.keys.first;
-      final errors = validationMessage![firstKey];
-      if (errors is List && errors.isNotEmpty) {
-        return errors.first;
-      }
+  /// ✅ Extracts a readable validation message
+  String? _extractFirstValidationMessage(Map<String, dynamic>? validation) {
+    if (validation == null || validation.isEmpty) return null;
+    final firstKey = validation.keys.first;
+    final firstValue = validation[firstKey];
+    if (firstValue is List && firstValue.isNotEmpty) {
+      return firstValue.first.toString();
     }
-    return null;
+    return firstValue.toString();
+  }
+
+  /// ✅ Public helper to get clean message
+  String? getErrorMessage() {
+    return message ?? getFirstValidationError() ?? error ?? "Unknown error occurred";
+  }
+
+  /// ✅ Returns first validation error (optional)
+  String? getFirstValidationError() {
+    if (validationMessage == null || validationMessage!.isEmpty) return null;
+    final firstKey = validationMessage!.keys.first;
+    final firstValue = validationMessage![firstKey];
+    if (firstValue is List && firstValue.isNotEmpty) {
+      return firstValue.first.toString();
+    }
+    return firstValue.toString();
   }
 }

@@ -172,39 +172,41 @@ class _PersonalInfoState extends State<PersonalInfo> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Obx(() {
-                        return CustomRoundButton(
-                          title: profileController.isLoading.value ? '' : 'update_profile'.tr,
-                          isLoading: profileController.isLoading.value,
-                          onPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ProfileDialogBox(
-                                  continueButton: 'Update'.tr,
-                                  onTap: () async {
-                                    Get.back();
-                                    profileController.isLoading.value = true;
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Obx(() {
+                          return CustomRoundButton(
+                            title: profileController.isLoading.value ? '' : 'update_profile'.tr,
+                            isLoading: profileController.isLoading.value,
+                            onPress: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ProfileDialogBox(
+                                    continueButton: 'Update'.tr,
+                                    onTap: () async {
+                                      Get.back();
+                                      profileController.isLoading.value = true;
 
-                                    try {
-                                      profileController.userProfileData.value?.userImg =
-                                          profileController.userImg.string;
-                                      await profileController.userProfileUpdate(context);
-                                    } finally {
-                                      profileController.isLoading.value = false;
-                                    }
-                                  },
-                                  text: "Are you sure you want to update the profile?",
-                                );
-                              },
-                            );
-                          },
-                        );
-                      }),
+                                      try {
+                                        profileController.userProfileData.value?.userImg =
+                                            profileController.userImg.string;
+                                        await profileController.userProfileUpdate(context);
+                                      } finally {
+                                        profileController.isLoading.value = false;
+                                      }
+                                    },
+                                    text: "Are you sure you want to update the profile?",
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        }),
+                      ),
                     ),
                   ),
                 ],

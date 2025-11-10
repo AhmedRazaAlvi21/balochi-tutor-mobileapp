@@ -24,7 +24,6 @@ class _CourseScreenState extends State<CourseScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Only fetch if course list is empty
       if (courseController.courseDayData.isEmpty) {
         courseController.getCourseDayData(context);
       }
@@ -64,23 +63,22 @@ class _CourseScreenState extends State<CourseScreen> {
                 color: AppColor.greyColor,
               ),
               items: (filter, _) {
-                final list = courseController.courseDayData ?? [];
+                final list = courseController.courseDayData.value ?? [];
                 final allTitles = list
-                    .where((c) => "day ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase()))
-                    .map((c) => "Day ${c.dayNumber}")
+                    .where((c) => "Days ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase()))
+                    .map((c) => "Days ${c.dayNumber}")
                     .toList();
-
-                if (!allTitles.contains("All Days")) {
+                if (filter.isNotEmpty && !allTitles.contains("All Days")) {
                   allTitles.insert(0, "All Days");
                 }
                 return allTitles;
               },
               onChange: (value) {
                 if (value == "All Days" || value.isEmpty) {
-                  courseController.filteredCourse.clear();
+                  courseController.filteredLesson.clear();
                 } else {
-                  courseController.selectCourse(value);
-                  courseController.onSearchCourse(value);
+                  courseController.selectLesson(value);
+                  courseController.onSearchLesson(value);
                 }
               },
               validator: (value) => value != null && value.isNotEmpty ? null : "Please select a course",
@@ -91,7 +89,6 @@ class _CourseScreenState extends State<CourseScreen> {
               if (courseController.isLoading.value && courseController.courseDayData.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
-
               if (courseController.errorMessage.isNotEmpty && courseController.courseDayData.isEmpty) {
                 return Center(
                   child: Column(
@@ -108,11 +105,9 @@ class _CourseScreenState extends State<CourseScreen> {
                   ),
                 );
               }
-
               final courseList = courseController.filteredCourse.isNotEmpty
                   ? courseController.filteredCourse
                   : (courseController.courseDayData ?? []);
-
               if (courseList.isEmpty) {
                 return const Center(child: Text('No courses available'));
               }
@@ -130,8 +125,7 @@ class _CourseScreenState extends State<CourseScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 12.w),
                     itemBuilder: (context, index) {
                       final course = courseList[index];
-                      debugPrint("Course ID: ${course.id}");
-                      debugPrint("Course isLocked: ${course.isLocked}");
+
                       return InkWell(
                         onTap: () async {
                           if (isNavigating) return;

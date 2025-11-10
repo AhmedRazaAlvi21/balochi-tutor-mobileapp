@@ -16,7 +16,6 @@ import '../../screens/auth/register_screens/register_name_screen.dart';
 import '../../screens/auth/register_screens/register_password_screen.dart';
 import '../../screens/auth/splash_screen.dart';
 import '../../screens/dashboard/course/lesson_details/lesson_complete_screen.dart';
-import '../../screens/dashboard/course/lesson_details/lesson_content_screen.dart';
 import '../../screens/dashboard/course/lesson_screen.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
 import '../../screens/dashboard/setting/about/about_screen.dart';
@@ -46,7 +45,7 @@ class AppRoutes {
         GetPage(name: RouteName.createNewPasswordScreen, page: () => CreateNewPasswordScreen()),
         GetPage(name: RouteName.dashboardScreen, page: () => DashboardScreen()),
         GetPage(name: RouteName.lessonScreen, page: () => LessonScreen()),
-        GetPage(name: RouteName.lessonContentScreen, page: () => LessonContentScreen()),
+        // GetPage(name: RouteName.lessonContentScreen, page: () => LessonContentScreen()),
         GetPage(name: RouteName.lessonCompleteScreen, page: () => LessonCompleteScreen()),
         GetPage(name: RouteName.settingScreen, page: () => SettingScreen()),
         GetPage(name: RouteName.personalInfo, page: () => PersonalInfo()),

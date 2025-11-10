@@ -9,8 +9,9 @@ import '../../widget/gradient_dropdown.dart';
 
 class LessonContentScreen extends StatefulWidget {
   final int? lessonId;
+  final int? order;
 
-  const LessonContentScreen({super.key, this.lessonId});
+  const LessonContentScreen({super.key, this.lessonId, required this.order});
 
   @override
   State<LessonContentScreen> createState() => _LessonContentScreenState();
@@ -37,7 +38,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.black,
-          title: const Text("Lesson Content", style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text("Lesson ${widget.order}", style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         body: Obx(() {
           final lesson = courseController.lessonContent.value;
@@ -71,7 +72,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 _buildLanguageCard("Urdu", lesson.urdu ?? "", () {
                   courseController.speak(lesson.urdu ?? "", langType: "Urdu");
                 }, isRtl: true),
-
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerRight,
@@ -84,13 +84,9 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // _buildLanguageCard(selected, balochiText, () {
-                //   print("sulemani");
-                // }, isRtl: true),
                 _buildLanguageCard(selected, balochiText, () {
                   courseController.speak(balochiText, langType: selected);
                 }, isRtl: true),
-
                 const SizedBox(height: 16),
                 _buildLanguageCard(
                   selected == "Sulemani Balochi" ? "Roman Sulemani Balochi" : "Roman Makrani Balochi",

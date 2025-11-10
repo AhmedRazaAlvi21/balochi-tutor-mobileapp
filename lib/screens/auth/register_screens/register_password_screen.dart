@@ -41,146 +41,138 @@ class RegisterPasswordScreen extends StatelessWidget {
             ),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Form(
-            key: registerController.formkey,
-            child: Column(
-              children: [
-                ProfileImageEditWidget(controller: registerController),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: CustomText(
-                      title: 'password_screen_text'.tr,
-                      fontcolor: AppColor.blackColor,
-                      fontsize: 20.sp,
-                      fontweight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 10.0,
-                    ),
-                    child: CustomText(
-                      title: 'password'.tr,
-                      fontcolor: AppColor.blackColor,
-                      fontweight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Obx(
-                    () => CustomFormField(
-                      title: '',
-                      ispassword: registerController.showPassword.value,
-                      sIcon: InkWell(
-                        onTap: () {
-                          registerController.showPassword.toggle();
-                        },
-                        child: Icon(
-                          !registerController.showPassword.value ? Icons.visibility : Icons.visibility_off,
-                          color: AppColor.primaryColor,
-                        ),
-                      ),
-                      onchange: (val) {
-                        if (registerController.formkey.currentState!.validate() &&
-                            registerController.validatePassword(val.toString())) {
-                          registerController.passwordValidate.value = true;
-                        } else {
-                          registerController.passwordValidate.value = false;
-                        }
-                      },
-                      validator: (val) {
-                        if (val.isEmpty) return "required";
-                        if (!registerController.validatePassword(val.toString())) {
-                          return "Password must contain at least\n• 1 Uppercase letter\n• 1 Digit";
-                        }
-                        if (val.length < 6) {
-                          return "Password must be at least 6 characters long";
-                        }
-                      },
-                      fieldcontroller: registerController.passwordController,
-                    ),
-                  ),
-                ),
-                SizedBox(height: context.blockSizeVertical * 2),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 10.0,
-                    ),
-                    child: CustomText(
-                      title: 'confirm'.tr + ' ' + 'password'.tr,
-                      fontcolor: AppColor.blackColor,
-                      fontweight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Obx(
-                    () => CustomFormField(
-                      title: '',
-                      ispassword: registerController.confirmShowPassword.value,
-                      sIcon: InkWell(
-                        onTap: () {
-                          registerController.confirmShowPassword.toggle();
-                        },
-                        child: Icon(
-                          !registerController.confirmShowPassword.value ? Icons.visibility : Icons.visibility_off,
-                          color: AppColor.primaryColor,
-                        ),
-                      ),
-                      onchange: (val) {
-                        if (registerController.formkey.currentState!.validate()) {
-                          registerController.passwordValidate.value = true;
-                        } else {
-                          registerController.passwordValidate.value = false;
-                        }
-                      },
-                      validator: (val) {
-                        if (val.isEmpty) return "required";
-                        if (val != registerController.passwordController.text) {
-                          return "Both passwords do not match";
-                        }
-                      },
-                      fieldcontroller: registerController.confirmPasswordController,
-                    ),
-                  ),
-                ),
-                SizedBox(height: context.blockSizeHorizontal * 5),
-                // CustomRoundButton(
-                //   title: 'continue'.tr,
-                //   isLoading: false,
-                //   onPress: () {
-                //     if (registerController.formkey.currentState!.validate()) {
-                //       final password = registerController.passwordController.text.trim();
-                //       final confirmPassword = registerController.confirmPasswordController.text.trim();
-                //       log('Selected Image Path: ${registerController.profilePicturePath.value}');
-                //       log('Entered Name: ${registerController.nameController.text}');
-                //       log('Entered age: ${registerController.ageController.text}');
-                //       log('Entered email: ${registerController.emailController.text}');
-                //       log('Entered password: $password');
-                //       log('Entered confirmPassword: $confirmPassword');
-                //       Get.toNamed(RouteName.registerCompleteScreen);
-                //     }
-                //   },
-                // ),
-                Obx(() {
-                  final isValid = registerController.passwordValidate.value;
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Form(
+                    key: registerController.formkey,
+                    child: Column(
+                      children: [
+                        ProfileImageEditWidget(controller: registerController),
+                        SizedBox(height: 20.h),
 
-                  return CustomRoundButton(
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: CustomText(
+                            title: 'password_screen_text'.tr,
+                            fontcolor: AppColor.blackColor,
+                            fontsize: 26.sp,
+                            fontweight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: CustomText(
+                            title: 'password'.tr,
+                            fontcolor: AppColor.blackColor,
+                            fontweight: FontWeight.w700,
+                          ),
+                        ),
+                        Obx(
+                          () => CustomFormField(
+                            title: '',
+                            ispassword: registerController.showPassword.value,
+                            sIcon: InkWell(
+                              onTap: () {
+                                registerController.showPassword.toggle();
+                              },
+                              child: Icon(
+                                !registerController.showPassword.value ? Icons.visibility : Icons.visibility_off,
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                            onchange: (val) {
+                              if (registerController.formkey.currentState!.validate() &&
+                                  registerController.validatePassword(val.toString())) {
+                                registerController.passwordValidate.value = true;
+                              } else {
+                                registerController.passwordValidate.value = false;
+                              }
+                            },
+                            validator: (val) {
+                              if (val.isEmpty) return "required";
+                              if (!registerController.validatePassword(val.toString())) {
+                                return "Password must contain at least\n• 1 Uppercase letter\n• 1 Digit";
+                              }
+                              if (val.length < 6) {
+                                return "Password must be at least 6 characters long";
+                              }
+                            },
+                            fieldcontroller: registerController.passwordController,
+                          ),
+                        ),
+                        SizedBox(height: context.blockSizeVertical * 2),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: CustomText(
+                            title: 'confirm'.tr + ' ' + 'password'.tr,
+                            fontcolor: AppColor.blackColor,
+                            fontweight: FontWeight.w700,
+                          ),
+                        ),
+                        Obx(
+                          () => CustomFormField(
+                            title: '',
+                            ispassword: registerController.confirmShowPassword.value,
+                            sIcon: InkWell(
+                              onTap: () {
+                                registerController.confirmShowPassword.toggle();
+                              },
+                              child: Icon(
+                                !registerController.confirmShowPassword.value ? Icons.visibility : Icons.visibility_off,
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                            onchange: (val) {
+                              if (registerController.formkey.currentState!.validate()) {
+                                registerController.passwordValidate.value = true;
+                              } else {
+                                registerController.passwordValidate.value = false;
+                              }
+                            },
+                            validator: (val) {
+                              if (val.isEmpty) return "required";
+                              if (val != registerController.passwordController.text) {
+                                return "Both passwords do not match";
+                              }
+                            },
+                            fieldcontroller: registerController.confirmPasswordController,
+                          ),
+                        ),
+                        SizedBox(height: context.blockSizeHorizontal * 5),
+                        // CustomRoundButton(
+                        //   title: 'continue'.tr,
+                        //   isLoading: false,
+                        //   onPress: () {
+                        //     if (registerController.formkey.currentState!.validate()) {
+                        //       final password = registerController.passwordController.text.trim();
+                        //       final confirmPassword = registerController.confirmPasswordController.text.trim();
+                        //       log('Selected Image Path: ${registerController.profilePicturePath.value}');
+                        //       log('Entered Name: ${registerController.nameController.text}');
+                        //       log('Entered age: ${registerController.ageController.text}');
+                        //       log('Entered email: ${registerController.emailController.text}');
+                        //       log('Entered password: $password');
+                        //       log('Entered confirmPassword: $confirmPassword');
+                        //       Get.toNamed(RouteName.registerCompleteScreen);
+                        //     }
+                        //   },
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Obx(() => registerController.passwordValidate.value
+                ? CustomRoundButton(
                     title: loadingController.isLoading.value ? null : 'continue'.tr,
                     isLoading: loadingController.isLoading.value,
-                    onPress: !isValid || loadingController.isLoading.value
+                    onPress: loadingController.isLoading.value
                         ? null
                         : () async {
                             loadingController.setLoading(true);
@@ -203,12 +195,10 @@ class RegisterPasswordScreen extends StatelessWidget {
                               loadingController.setLoading(false);
                             }
                           },
-                  );
-                }),
-                SizedBox(height: context.blockSizeVertical * 3),
-              ],
-            ),
-          ),
+                  )
+                : Center()),
+            SizedBox(height: context.blockSizeVertical * 3),
+          ],
         ),
       ),
     );

@@ -220,11 +220,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                         loginController.emailController.text;
                                                   } else if (response.responseData?.error != null) {
                                                     if (response.responseData?.error == "Validation Error") {
-                                                      Utils.toastMessage(
-                                                          context, "${response.responseData!.message}", false);
+                                                      Utils.toastMessage(context,
+                                                          "${response.responseData!.getErrorMessage()}", false);
                                                     } else {
-                                                      Utils.toastMessage(
-                                                          context, "${response.responseData?.error}", false);
+                                                      Utils.toastMessage(context,
+                                                          "${response.responseData?.getErrorMessage()}", false);
                                                     }
                                                   } else {
                                                     Utils.toastMessage(
@@ -270,7 +270,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             CustomAuthWidget(
                                 iconPath: ImageAssets.google_logo,
                                 ontap: () {
-                                  // loginController.googleAuth(context);
+                                  loginController.googleAuth(context);
                                 }),
                           ],
                         ),

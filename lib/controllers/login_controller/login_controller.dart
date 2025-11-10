@@ -32,6 +32,8 @@ class LoginController extends GetxController {
   void googleAuth(BuildContext context) {
     loadingController.setLoading(true);
     _socialApi.googleAuth().then((response) {
+      print("response google auth ======================= ${response}");
+
       if (response != null) {
         SocialLoginService().callSocialLoginService(context, user: response).then((value) {
           print("status code ======================= ${value.responseData?.statusCode}");

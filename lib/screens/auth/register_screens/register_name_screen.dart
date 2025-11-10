@@ -48,125 +48,117 @@ class RegisterNameScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.antiAlias,
-                      children: [
-                        SizedBox(
-                          width: context.blockSizeHorizontal * 20,
-                          height: context.blockSizeHorizontal * 20,
-                          child: Obx(
-                            () => CircleAvatar(
-                              foregroundImage: registerController.profilePicturePath.value.isNotEmpty
-                                  ? FileImage(File(registerController.profilePicturePath.value))
-                                  : AssetImage(ImageAssets.person2) as ImageProvider,
-                              child: registerController.profilePicturePath.value.isEmpty ? Icon(Icons.person) : null,
-                            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            clipBehavior: Clip.antiAlias,
+                            children: [
+                              SizedBox(
+                                width: 70.w,
+                                height: 70.h,
+                                child: Obx(
+                                  () => CircleAvatar(
+                                    foregroundImage: registerController.profilePicturePath.value.isNotEmpty
+                                        ? FileImage(File(registerController.profilePicturePath.value))
+                                        : AssetImage(ImageAssets.person2) as ImageProvider,
+                                    child:
+                                        registerController.profilePicturePath.value.isEmpty ? Icon(Icons.person) : null,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: CustomImagePickerWidget(),
+                              ),
+                            ],
                           ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CustomImagePickerWidget(),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CustomText(
-                          title: 'Andrew Ainsley',
+                          SizedBox(width: 20.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                title: 'Andrew Ainsley',
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 20.sp,
+                                fontweight: FontWeight.w700,
+                              ),
+                              CustomText(
+                                title: 'abc@yourdomain.com',
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 14.sp,
+                                fontweight: FontWeight.w500,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          title: 'name_screen_text'.tr,
                           fontcolor: AppColor.blackColor,
-                          fontsize: 20.sp,
+                          fontsize: 26.sp,
                           fontweight: FontWeight.w700,
                         ),
-                        CustomText(
-                          title: 'abc@yourdomain.com',
-                          fontcolor: AppColor.blackColor,
-                          fontsize: 14.sp,
-                          fontweight: FontWeight.w500,
+                      ),
+                      SizedBox(height: 20.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          title: 'full_name'.tr,
+                          fontcolor: AppColor.black121,
+                          fontsize: 16.sp,
+                          fontweight: FontWeight.w700,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: CustomText(
-                      title: 'name_screen_text'.tr,
-                      fontcolor: AppColor.blackColor,
-                      fontsize: 20.sp,
-                      fontweight: FontWeight.w700,
-                    ),
+                      ),
+                      CustomFormField(
+                        title: '',
+                        onchange: (val) {
+                          registerController.nameValidate.value = val.toString().trim().length >= 3;
+                        },
+                        validator: (val) {
+                          if (val.isEmpty) {
+                            return "Name is required";
+                          } else if (val.trim().length < 3) {
+                            return "Name must be at least 3 characters long";
+                          }
+                        },
+                        fieldcontroller: registerController.nameController,
+                      ),
+                      SizedBox(
+                        height: context.blockSizeVertical * 5,
+                      ),
+                    ],
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 10.0,
-                    ),
-                    child: CustomText(
-                      title: 'full_name'.tr,
-                      fontcolor: AppColor.blackColor,
-                      fontsize: 16.sp,
-                      fontweight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 25.0,
-                  ),
-                  child: CustomFormField(
-                    title: '',
-                    onchange: (val) {
-                      // registerController.nameValidate.value = val.toString().isNotEmpty;
-                      registerController.nameValidate.value = val.toString().trim().length >= 3;
-                    },
-                    validator: (val) {
-                      if (val.isEmpty) {
-                        return "Name is required";
-                      } else if (val.trim().length < 3) {
-                        return "Name must be at least 3 characters long";
-                      }
-                    },
-                    fieldcontroller: registerController.nameController,
-                  ),
-                ),
-                SizedBox(
-                  height: context.blockSizeVertical * 5,
-                ),
-                Obx(
-                  () => registerController.nameValidate.value
-                      ? Align(
-                          alignment: Alignment.bottomCenter,
-                          child: CustomRoundButton(
-                            title: 'continue'.tr,
-                            onPress: () {
-                              log('Selected Image Path: ${registerController.profilePicturePath.value}');
-                              log('Entered Name: ${registerController.nameController.text}');
-
-                              Get.toNamed(RouteName.registerAgeScreen);
-                            },
-                          ),
-                        )
-                      : Center(),
-                ),
-                SizedBox(
-                  height: context.blockSizeVertical * 3,
-                ),
-              ],
+              ),
+            ),
+            Obx(
+              () => registerController.nameValidate.value
+                  ? Align(
+                      alignment: Alignment.bottomCenter,
+                      child: CustomRoundButton(
+                        title: 'continue'.tr,
+                        onPress: () {
+                          log('Selected Image Path: ${registerController.profilePicturePath.value}');
+                          log('Entered Name: ${registerController.nameController.text}');
+                          Get.toNamed(RouteName.registerAgeScreen);
+                        },
+                      ),
+                    )
+                  : Center(),
+            ),
+            SizedBox(
+              height: context.blockSizeVertical * 3,
             ),
           ],
         ),
