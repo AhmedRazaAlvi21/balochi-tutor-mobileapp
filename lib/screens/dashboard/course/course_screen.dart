@@ -49,7 +49,6 @@ class _CourseScreenState extends State<CourseScreen> {
       ),
       body: Column(
         children: [
-          // 🔍 Search Dropdown
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w) + EdgeInsets.only(bottom: 12.h),
             child: SearchDropDownTextField(
@@ -63,22 +62,42 @@ class _CourseScreenState extends State<CourseScreen> {
                 color: AppColor.greyColor,
               ),
               items: (filter, _) {
-                final list = courseController.courseDayData.value ?? [];
-                final allTitles = list
-                    .where((c) => "Days ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase()))
-                    .map((c) => "Days ${c.dayNumber}")
-                    .toList();
-                if (filter.isNotEmpty && !allTitles.contains("All Days")) {
+                final list = courseController.courseDayData.toList();
+                final allTitles = <String>[];
+
+                // Always add "All Days" first
+                if (!allTitles.contains("All Days")) {
                   allTitles.insert(0, "All Days");
                 }
+
+                // Filter courses by day number or title
+                final filteredTitles = list
+                    .where((c) {
+                      final dayMatch = "Days ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase());
+                      final titleMatch = (c.title?.toLowerCase().contains(filter.toLowerCase()) ?? false);
+                      return dayMatch || titleMatch;
+                    })
+                    .map((c) => "Days ${c.dayNumber}")
+                    .toList();
+
+                allTitles.addAll(filteredTitles);
                 return allTitles;
               },
               onChange: (value) {
                 if (value == "All Days" || value.isEmpty) {
-                  courseController.filteredLesson.clear();
+                  // Show all courses
+                  courseController.filteredCourse.clear();
+                  courseController.update(['course_list']);
                 } else {
-                  courseController.selectLesson(value);
-                  courseController.onSearchLesson(value);
+                  // Extract the search term from "Days X" format
+                  final searchTerm = value.replaceAll("Days ", "").trim();
+                  final allCourses = courseController.courseDayData;
+
+                  // Filter courses where day number contains the search term
+                  // This will show Day 5, 15, 25, 35, etc. when searching "5"
+                  courseController.filteredCourse.value =
+                      allCourses.where((course) => course.dayNumber.toString().contains(searchTerm)).toList();
+                  courseController.update(['course_list']);
                 }
               },
               validator: (value) => value != null && value.isNotEmpty ? null : "Please select a course",
@@ -107,7 +126,7 @@ class _CourseScreenState extends State<CourseScreen> {
               }
               final courseList = courseController.filteredCourse.isNotEmpty
                   ? courseController.filteredCourse
-                  : (courseController.courseDayData ?? []);
+                  : courseController.courseDayData.toList();
               if (courseList.isEmpty) {
                 return const Center(child: Text('No courses available'));
               }

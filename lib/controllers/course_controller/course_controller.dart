@@ -276,7 +276,7 @@ class CourseController extends GetxController {
                         height: 35.h,
                         onPress: () {
                           Get.back();
-                          Get.offAllNamed(RouteName.lessonCompleteScreen);
+                          Get.toNamed(RouteName.lessonCompleteScreen);
                         },
                         title: "Next",
                       ),
