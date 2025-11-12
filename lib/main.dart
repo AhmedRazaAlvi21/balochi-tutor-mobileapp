@@ -1,6 +1,7 @@
 import 'package:balochi_tutor/controllers/profile_controller/profile_controller.dart';
 import 'package:balochi_tutor/res/theme/app_theme.dart';
 import 'package:balochi_tutor/service/TokenService/Device_token/FetchDeviceToken.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -13,12 +14,16 @@ import 'controllers/login_controller/login_controller.dart';
 import 'controllers/premium_controller/premium_controller.dart';
 import 'controllers/registration_controller/registartion_controller.dart';
 import 'controllers/settings_controller/settings_controller.dart';
+import 'firebase_options.dart';
 import 'my_app.dart';
 
 String? deviceToken;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   deviceToken = await fetchDeviceToken();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

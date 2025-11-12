@@ -89,92 +89,94 @@ class QuizScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(),
-
-            /// Dropdown
-            Obx(() => Container(
-                  width: 195.w,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: AppColor.gradientButton,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      dropdownColor: AppColor.primaryColor,
-                      borderRadius: BorderRadius.circular(16.r),
-                      value: controller.selectedType.value.isEmpty ? null : controller.selectedType.value,
-                      hint: Text(
-                        "Select Quiz Type",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+            Expanded(
+                child: SafeArea(
+              child: Column(
+                children: [
+                  Obx(() => Container(
+                        width: 195.w,
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: AppColor.gradientButton,
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ),
-                      icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                      items: controller.quizTypes
-                          .map(
-                            (type) => DropdownMenuItem(
-                              value: type,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: AppColor.gradientButton,
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(16.r),
-                                ),
-                                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                                child: Text(
-                                  type,
-                                  style: TextStyle(
-                                    color: AppColor.whiteColor,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            dropdownColor: AppColor.primaryColor,
+                            borderRadius: BorderRadius.circular(16.r),
+                            value: controller.selectedType.value.isEmpty ? null : controller.selectedType.value,
+                            hint: Text(
+                              "Select Quiz Type",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
                               ),
                             ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        controller.setQuizType(value!);
-                      },
-                    ),
-                  ),
-                )),
-
-            SizedBox(height: 5.h),
-            Obx(() {
-              if (controller.selectedType.value.isNotEmpty) {
-                return GradientButtonWidget(
-                  title: "Start Quiz",
-                  onTap: () {
-                    Get.to(() => StartQuiz(
-                          quizId: quizId,
-                          selectedType: controller.selectedType.value,
-                        ));
-                  },
-                );
-              } else {
-                return SizedBox();
-              }
-            }),
-
-            SizedBox(height: 30.h),
+                            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                            items: controller.quizTypes
+                                .map(
+                                  (type) => DropdownMenuItem(
+                                    value: type,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: AppColor.gradientButton,
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(16.r),
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                      child: Text(
+                                        type,
+                                        style: TextStyle(
+                                          color: AppColor.whiteColor,
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) {
+                              controller.setQuizType(value!);
+                            },
+                          ),
+                        ),
+                      )),
+                  SizedBox(height: 5.h),
+                  Obx(() {
+                    if (controller.selectedType.value.isNotEmpty) {
+                      return GradientButtonWidget(
+                        title: "Start Quiz",
+                        onTap: () {
+                          Get.to(() => StartQuiz(
+                                quizId: quizId,
+                                selectedType: controller.selectedType.value,
+                              ));
+                        },
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  }),
+                  SizedBox(height: 30.h),
+                ],
+              ),
+            ))
           ],
         ),
       ),

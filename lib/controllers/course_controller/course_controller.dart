@@ -41,6 +41,7 @@ class CourseController extends GetxController {
   var isSpeaking = false.obs;
   var quizId = 0;
   bool hasFetchedCompletedLessons = false;
+  var isDropdownExpanded = false.obs;
 
   @override
   void onInit() {
@@ -79,7 +80,7 @@ class CourseController extends GetxController {
         quizId = 0;
       } else if (responseData?.quiz != null) {
         quizId = responseData?.quiz?.id ?? 0;
-        errorMessage.value = "You must complete the quiz for this day before accessing lessons";
+        errorMessage.value = responseData?.message ?? "You must complete and pass the quiz to access this day";
         debugPrint("Quiz required with ID: $quizId");
       } else {
         errorMessage.value = responseData?.message ?? 'Something went wrong';
@@ -99,7 +100,7 @@ class CourseController extends GetxController {
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         completedLessonsData.value = response.responseData?.completedLessons ?? [];
       } else {
-        debugPrint("⚠️ Failed to fetch course data: ${errorMessage.value}");
+        debugPrint("Failed to fetch course data: ${errorMessage.value}");
       }
     } catch (e) {
       errorMessage.value = e.toString();
@@ -275,7 +276,7 @@ class CourseController extends GetxController {
                         height: 35.h,
                         onPress: () {
                           Get.back();
-                          Get.offAllNamed(RouteName.lessonCompleteScreen);
+                          Get.toNamed(RouteName.lessonCompleteScreen);
                         },
                         title: "Next",
                       ),

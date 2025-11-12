@@ -15,6 +15,7 @@ class LessonCompleteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final courseCont = Get.find<CourseController>();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!courseCont.hasFetchedCompletedLessons) {
         courseCont.fetchCompleteLesson(context);
@@ -22,61 +23,69 @@ class LessonCompleteScreen extends StatelessWidget {
       }
     });
 
-    return BackgroundWidget(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offAllNamed(RouteName.dashboardScreen);
+        return false; // prevent default pop behavior
+      },
+      child: BackgroundWidget(
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          title: Text(
-            "Lesson Completed",
-            style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w700,
-              color: AppColor.black121,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Text(
+              "Lesson Completed",
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.w700,
+                color: AppColor.black121,
+              ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Get.offAllNamed(RouteName.dashboardScreen),
             ),
           ),
-          leading: IconButton(
-              icon: const Icon(Icons.arrow_back), onPressed: () => Get.offAllNamed(RouteName.dashboardScreen)),
-        ),
-        body: Obx(() {
-          if (courseCont.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          body: Obx(() {
+            if (courseCont.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          final lessons = courseCont.completedLessonsData;
+            final lessons = courseCont.completedLessonsData;
 
-          if (lessons.isEmpty) {
-            return Center(
-              child: Text(
-                "No completed lessons found",
-                style: TextStyle(
-                  color: AppColor.black121,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
+            if (lessons.isEmpty) {
+              return Center(
+                child: Text(
+                  "No completed lessons found",
+                  style: TextStyle(
+                    color: AppColor.black121,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                await courseCont.fetchCompleteLesson(context);
+              },
+              child: ListView.builder(
+                itemCount: lessons.length,
+                padding: EdgeInsets.all(12.w),
+                itemBuilder: (context, index) {
+                  final lesson = lessons[index];
+                  return CourseCompleteWidget(
+                    title: lesson.title ?? "N/A",
+                    lessonNo: "Day",
+                    lesson: "${lesson.order} / ${lessons.length} Lesson",
+                    image: ImageAssets.courseImage,
+                  );
+                },
               ),
             );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              await courseCont.fetchCompleteLesson(context);
-            },
-            child: ListView.builder(
-              itemCount: lessons.length,
-              padding: EdgeInsets.all(12.w),
-              itemBuilder: (context, index) {
-                final lesson = lessons[index];
-                return CourseCompleteWidget(
-                  title: lesson.title ?? "N/A",
-                  lessonNo: "Day",
-                  lesson: "${lesson.order} / ${lessons.length} Lesson",
-                  image: ImageAssets.courseImage,
-                );
-              },
-            ),
-          );
-        }),
+          }),
+        ),
       ),
     );
   }
