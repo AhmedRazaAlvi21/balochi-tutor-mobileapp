@@ -156,14 +156,16 @@ class RegisterAgeScreen extends StatelessWidget {
             ),
             Obx(
               () => registerController.ageValidate.value
-                  ? CustomRoundButton(
-                      title: 'continue'.tr,
-                      onPress: () {
-                        log('Selected Image Path: ${registerController.profilePicturePath.value}');
-                        log('Entered Name: ${registerController.ageController.text}');
+                  ? SafeArea(
+                      child: CustomRoundButton(
+                        title: 'continue'.tr,
+                        onPress: () {
+                          log('Selected Image Path: ${registerController.profilePicturePath.value}');
+                          log('Entered Name: ${registerController.ageController.text}');
 
-                        Get.toNamed(RouteName.registerEmailScreen);
-                      },
+                          Get.toNamed(RouteName.registerEmailScreen);
+                        },
+                      ),
                     )
                   : Center(),
             ),

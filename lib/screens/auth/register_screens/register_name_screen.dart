@@ -144,15 +144,17 @@ class RegisterNameScreen extends StatelessWidget {
             ),
             Obx(
               () => registerController.nameValidate.value
-                  ? Align(
-                      alignment: Alignment.bottomCenter,
-                      child: CustomRoundButton(
-                        title: 'continue'.tr,
-                        onPress: () {
-                          log('Selected Image Path: ${registerController.profilePicturePath.value}');
-                          log('Entered Name: ${registerController.nameController.text}');
-                          Get.toNamed(RouteName.registerAgeScreen);
-                        },
+                  ? SafeArea(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: CustomRoundButton(
+                          title: 'continue'.tr,
+                          onPress: () {
+                            log('Selected Image Path: ${registerController.profilePicturePath.value}');
+                            log('Entered Name: ${registerController.nameController.text}');
+                            Get.toNamed(RouteName.registerAgeScreen);
+                          },
+                        ),
                       ),
                     )
                   : Center(),

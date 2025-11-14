@@ -127,11 +127,13 @@ class StartQuiz extends StatelessWidget {
                 ),
               ),
 
-              GradientButtonWidget(
-                title: buttonText,
-                onTap: () {
-                  _onSubmit(context, controller, correctIndex);
-                },
+              SafeArea(
+                child: GradientButtonWidget(
+                  title: buttonText,
+                  onTap: () {
+                    _onSubmit(context, controller, correctIndex);
+                  },
+                ),
               ),
               SizedBox(height: 30.h),
             ],

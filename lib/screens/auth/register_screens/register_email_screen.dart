@@ -153,16 +153,18 @@ class RegisterEmailScreen extends StatelessWidget {
             )),
             Obx(
               () => registerController.emailValidate.value
-                  ? CustomRoundButton(
-                      title: 'continue'.tr,
-                      onPress: () {
-                        log('Selected Image Path: ${registerController.profilePicturePath.value}');
-                        log('Entered Name: ${registerController.nameController.text}');
-                        log('Entered age: ${registerController.ageController.text}');
-                        log('Entered email: ${registerController.emailController.text}');
+                  ? SafeArea(
+                      child: CustomRoundButton(
+                        title: 'continue'.tr,
+                        onPress: () {
+                          log('Selected Image Path: ${registerController.profilePicturePath.value}');
+                          log('Entered Name: ${registerController.nameController.text}');
+                          log('Entered age: ${registerController.ageController.text}');
+                          log('Entered email: ${registerController.emailController.text}');
 
-                        Get.toNamed(RouteName.registerPasswordScreen);
-                      },
+                          Get.toNamed(RouteName.registerPasswordScreen);
+                        },
+                      ),
                     )
                   : Center(),
             ),

@@ -169,32 +169,34 @@ class RegisterPasswordScreen extends StatelessWidget {
               ),
             ),
             Obx(() => registerController.passwordValidate.value
-                ? CustomRoundButton(
-                    title: loadingController.isLoading.value ? null : 'continue'.tr,
-                    isLoading: loadingController.isLoading.value,
-                    onPress: loadingController.isLoading.value
-                        ? null
-                        : () async {
-                            loadingController.setLoading(true);
-                            try {
-                              final response = await SignupService().callSignupService(context, true);
-                              if (response.responseData?.code == 200 || response.responseData?.code == 201) {
-                                Utils.toastMessage(context, "${response.responseData?.message}", true);
-                                Future.delayed(const Duration(seconds: 2), () {
-                                  Get.toNamed(RouteName.confirmOtpScreen, arguments: {'isForget': false});
-                                });
-                              } else if (response.responseData?.error != null) {
-                                Utils.toastMessage(context, "${response.responseData?.error}", false);
-                              } else {
-                                Utils.toastMessage(context, "Something went wrong", false);
+                ? SafeArea(
+                    child: CustomRoundButton(
+                      title: loadingController.isLoading.value ? null : 'continue'.tr,
+                      isLoading: loadingController.isLoading.value,
+                      onPress: loadingController.isLoading.value
+                          ? null
+                          : () async {
+                              loadingController.setLoading(true);
+                              try {
+                                final response = await SignupService().callSignupService(context, true);
+                                if (response.responseData?.code == 200 || response.responseData?.code == 201) {
+                                  Utils.toastMessage(context, "${response.responseData?.message}", true);
+                                  Future.delayed(const Duration(seconds: 2), () {
+                                    Get.toNamed(RouteName.confirmOtpScreen, arguments: {'isForget': false});
+                                  });
+                                } else if (response.responseData?.error != null) {
+                                  Utils.toastMessage(context, "${response.responseData?.error}", false);
+                                } else {
+                                  Utils.toastMessage(context, "Something went wrong", false);
+                                }
+                              } catch (error) {
+                                Utils.toastMessage(context, "An error occurred: $error", false);
+                                print("Error during signup: $error");
+                              } finally {
+                                loadingController.setLoading(false);
                               }
-                            } catch (error) {
-                              Utils.toastMessage(context, "An error occurred: $error", false);
-                              print("Error during signup: $error");
-                            } finally {
-                              loadingController.setLoading(false);
-                            }
-                          },
+                            },
+                    ),
                   )
                 : Center()),
             SizedBox(height: context.blockSizeVertical * 3),

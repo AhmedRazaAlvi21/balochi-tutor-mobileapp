@@ -186,37 +186,35 @@ class CreateNewPasswordScreen extends StatelessWidget {
               )),
               Obx(() {
                 return forgetPasswordController.newPasswordValidate.value
-                    ? Column(
-                        children: [
-                          CustomRoundButton(
-                            title: loadingController.isLoading.value ? null : 'Continue'.tr,
-                            isLoading: loadingController.isLoading.value,
-                            onPress: loadingController.isLoading.value
-                                ? null
-                                : () async {
-                                    loadingController.setLoading(true);
-                                    try {
-                                      var response = await ResetPasswordService().callResetPasswordService(context);
-                                      if ((response.responseData?.success != false &&
-                                              response.responseData?.code == 200) ||
-                                          response.responseData?.code == 201) {
-                                        Utils.toastMessage(context, "${response.responseData?.message}", true);
-                                        Future.delayed(const Duration(seconds: 2), () {
-                                          Get.toNamed(RouteName.loginScreen);
-                                        });
-                                      } else if (response.responseData?.success == false) {
-                                        Utils.toastMessage(context, "${response.responseData?.message}", false);
-                                      } else {
-                                        Utils.toastMessage(context, "Reset Password failed.Please try again.", false);
-                                      }
-                                    } catch (error) {
-                                      Utils.toastMessage(context, "An error occurred: $error", false);
-                                    } finally {
-                                      loadingController.setLoading(false);
+                    ? SafeArea(
+                        child: CustomRoundButton(
+                          title: loadingController.isLoading.value ? null : 'Continue'.tr,
+                          isLoading: loadingController.isLoading.value,
+                          onPress: loadingController.isLoading.value
+                              ? null
+                              : () async {
+                                  loadingController.setLoading(true);
+                                  try {
+                                    var response = await ResetPasswordService().callResetPasswordService(context);
+                                    if ((response.responseData?.success != false &&
+                                            response.responseData?.code == 200) ||
+                                        response.responseData?.code == 201) {
+                                      Utils.toastMessage(context, "${response.responseData?.message}", true);
+                                      Future.delayed(const Duration(seconds: 2), () {
+                                        Get.toNamed(RouteName.loginScreen);
+                                      });
+                                    } else if (response.responseData?.success == false) {
+                                      Utils.toastMessage(context, "${response.responseData?.message}", false);
+                                    } else {
+                                      Utils.toastMessage(context, "Reset Password failed.Please try again.", false);
                                     }
-                                  },
-                          ),
-                        ],
+                                  } catch (error) {
+                                    Utils.toastMessage(context, "An error occurred: $error", false);
+                                  } finally {
+                                    loadingController.setLoading(false);
+                                  }
+                                },
+                        ),
                       )
                     : const SizedBox.shrink();
               }),

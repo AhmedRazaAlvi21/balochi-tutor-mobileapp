@@ -64,9 +64,11 @@ class _QuizFillTheBlanksState extends State<QuizFillTheBlanks> {
               SizedBox(height: 50.h),
               _buildCapsuleAnswerField(context, answerController),
               SizedBox(height: 60.h),
-              GradientButtonWidget(
-                title: currentIndex == widget.fillQuestions.length - 1 ? "Submit" : "Next",
-                onTap: () => _handleSubmit(context),
+              SafeArea(
+                child: GradientButtonWidget(
+                  title: currentIndex == widget.fillQuestions.length - 1 ? "Submit" : "Next",
+                  onTap: () => _handleSubmit(context),
+                ),
               ),
             ],
           ),

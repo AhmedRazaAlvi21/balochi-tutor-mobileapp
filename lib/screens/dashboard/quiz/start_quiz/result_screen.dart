@@ -31,23 +31,27 @@ class ResultScreen extends StatelessWidget {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: _buildAppBar(),
-          body: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _ResultCard(
-                  passed: passed,
-                  score: score,
-                  totalQuestions: totalQuestions,
-                  correctAnswers: correctAnswers,
-                ),
-                SizedBox(height: 30.h),
-                GradientButtonWidget(
-                  title: passed ? "Done" : "Continue",
-                  onTap: () => Get.offAllNamed(RouteName.dashboardScreen),
-                ),
-              ],
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _ResultCard(
+                    passed: passed,
+                    score: score,
+                    totalQuestions: totalQuestions,
+                    correctAnswers: correctAnswers,
+                  ),
+                  SizedBox(height: 30.h),
+                  SafeArea(
+                    child: GradientButtonWidget(
+                      title: passed ? "Done" : "Continue",
+                      onTap: () => Get.offAllNamed(RouteName.dashboardScreen),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
