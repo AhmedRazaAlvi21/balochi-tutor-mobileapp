@@ -95,7 +95,7 @@ class StartQuiz extends StatelessWidget {
                               controller.quizData.value?.questions?[controller.currentQuestionIndex.value].id ?? 0;
                           controller.selectOption(
                             questionId,
-                            index + 1, // the selected answer value (e.g., option number)
+                            index, // the selected answer value (e.g., option number)
                             index, // to highlight UI
                           );
                         },
@@ -150,7 +150,9 @@ class StartQuiz extends StatelessWidget {
       return;
     }
 
-    bool isCorrect = controller.selectedIndex.value == (correctIndex - 1);
+    bool isCorrect = controller.selectedIndex.value == correctIndex;
+
+    print("iscorrect ========== $isCorrect");
     final quiz = controller.quizData.value!;
 
     showModalBottomSheet(

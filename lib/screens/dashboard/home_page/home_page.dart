@@ -1,5 +1,6 @@
 import 'package:balochi_tutor/res/colors/app_color.dart';
 import 'package:balochi_tutor/res/routes/routes_name.dart';
+import 'package:balochi_tutor/screens/dashboard/home_page/notification_screen/notification_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -131,7 +132,11 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          Icon(Icons.notifications, color: Colors.white, size: 28.sp),
+                          InkWell(
+                              onTap: () {
+                                Get.to(() => NotificationScreen());
+                              },
+                              child: Icon(Icons.notifications, color: Colors.white, size: 28.sp)),
                         ],
                       ),
                     ],

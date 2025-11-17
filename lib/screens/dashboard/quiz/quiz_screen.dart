@@ -131,13 +131,9 @@ class QuizScreen extends StatelessWidget {
                                     value: type,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: AppColor.gradientButton,
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                        ),
                                         borderRadius: BorderRadius.circular(16.r),
                                       ),
+                                      margin: EdgeInsets.only(bottom: 4.h),
                                       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                                       child: Text(
                                         type,

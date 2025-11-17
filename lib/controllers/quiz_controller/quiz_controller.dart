@@ -127,8 +127,8 @@ class QuizController extends GetxController {
         debugPrint("❌ Quiz submission failed.");
         debugPrint("Response Code: ${response.responseData?.code}");
         debugPrint("Response Message: ${response.responseData?.data?.passed}");
-        Get.snackbar("Error", "${response.responseData?.type}",
-            backgroundColor: AppColor.redColor, colorText: AppColor.whiteColor);
+        Get.snackbar("Error", "${response.responseData?.type}, Please try again tomorrow.",
+            backgroundColor: AppColor.redColor, colorText: AppColor.whiteColor, duration: Duration(seconds: 3));
       }
     } catch (e) {
       debugPrint("🔥 Exception in submitQuiz: $e");

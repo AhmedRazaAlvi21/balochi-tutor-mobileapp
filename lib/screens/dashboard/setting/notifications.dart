@@ -60,32 +60,32 @@ class Notifications extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Obx(
-                    () => ListTile(
-                      title: CustomText(
-                        title: 'App Updates',
-                        fontcolor: AppColor.blackColor,
-                        textalign: TextAlign.left,
-                        fontsize: 18,
-                        fontweight: FontWeight.w600,
-                      ),
-                      trailing: SizedBox(
-                        height: MediaQuery.of(context).orientation == Orientation.portrait
-                            ? MediaQuery.of(context).size.height * 0.04
-                            : MediaQuery.of(context).size.width * 0.05,
-                        width: MediaQuery.of(context).size.width * 0.15,
-                        child: FlutterSwitch(
-                          value: settingsController.allowAppUpdates.value,
-                          toggleSize: 24,
-                          activeColor: AppColor.primaryColor,
-                          activeToggleColor: AppColor.whiteColor,
-                          inactiveColor: AppColor.greyColor.withOpacity(0.5),
-                          inactiveToggleColor: AppColor.whiteColor,
-                          onToggle: settingsController.toggleAppUpdates,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Obx(
+                  //   () => ListTile(
+                  //     title: CustomText(
+                  //       title: 'App Updates',
+                  //       fontcolor: AppColor.blackColor,
+                  //       textalign: TextAlign.left,
+                  //       fontsize: 18,
+                  //       fontweight: FontWeight.w600,
+                  //     ),
+                  //     trailing: SizedBox(
+                  //       height: MediaQuery.of(context).orientation == Orientation.portrait
+                  //           ? MediaQuery.of(context).size.height * 0.04
+                  //           : MediaQuery.of(context).size.width * 0.05,
+                  //       width: MediaQuery.of(context).size.width * 0.15,
+                  //       child: FlutterSwitch(
+                  //         value: settingsController.allowAppUpdates.value,
+                  //         toggleSize: 24,
+                  //         activeColor: AppColor.primaryColor,
+                  //         activeToggleColor: AppColor.whiteColor,
+                  //         inactiveColor: AppColor.greyColor.withOpacity(0.5),
+                  //         inactiveToggleColor: AppColor.whiteColor,
+                  //         onToggle: settingsController.toggleAppUpdates,
+                  //       ),
+                  //     ),
+                  //   ),
+                  //),
                   const SizedBox(height: 30),
                 ],
               ),
@@ -102,8 +102,8 @@ class Notifications extends StatelessWidget {
                       return ProfileDialogBox(
                         continueButton: 'Update'.tr,
                         onTap: () async {
-                          settingsController.updateSettings();
-                          Get.back(); // close dialog
+                          Get.back();
+                          await settingsController.updateNotification(context);
                         },
                         text: "Are you sure you want to update the notifications?",
                       );

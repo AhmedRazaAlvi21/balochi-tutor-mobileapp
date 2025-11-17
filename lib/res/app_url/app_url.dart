@@ -20,4 +20,6 @@ class AppUrl {
   static const String paymentProcess = '/payment/process';
   static const String quizApi = '/quiz';
   static const String quizSubmit = '/quiz/submit';
+  static const String updateAllowNotificationsApi = '/update/allow/notifications';
+  static const String notificationsApi = '/notifications';
 }
