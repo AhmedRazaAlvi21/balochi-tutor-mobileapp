@@ -69,8 +69,8 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> _initializeData() async {
-    final context = Get.context!;
-    await getUserProfileData(context);
+    final context = Get.context;
+    await getUserProfileData(context!);
     await getDashboardData(context);
     final courseId = dashboardData.value?.course?.id;
     if (courseId != null) {

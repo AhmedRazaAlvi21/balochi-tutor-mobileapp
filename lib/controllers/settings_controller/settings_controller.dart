@@ -10,18 +10,18 @@ class SettingsController extends GetxController with GetSingleTickerProviderStat
   var allowAppUpdates = false.obs;
   var notifications = <GetNotificationData>[].obs;
   var isLoading = false.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchNotifications();
-  }
+  //
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   fetchNotifications(Contect);
+  // }
 
   void toggleNotifications(bool value) {
     allowNotifications.value = value;
   }
 
-  Future<void> fetchNotifications() async {
+  Future<void> fetchNotifications(BuildContext context) async {
     final context = Get.context!;
     try {
       isLoading.value = true;

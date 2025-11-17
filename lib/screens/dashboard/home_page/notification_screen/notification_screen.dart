@@ -14,6 +14,7 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchNotifications(context);
     return BackgroundWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -32,13 +33,25 @@ class NotificationScreen extends StatelessWidget {
           ),
         ),
         body: Obx(() {
-          // if (controller.isLoading.value) {
-          //   return const Center(child: CircularProgressIndicator());
-          // }
-          //
-          // if (controller.notifications.isEmpty) {
-          //   return const Center(child: Text("No Notifications Found"));
-          // }
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.notifications.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.notifications_off, size: 60, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text(
+                    "No notifications yet",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView.builder(
             padding: EdgeInsets.all(12.sp),
