@@ -70,6 +70,7 @@ class NotificationScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 6.sp),
                     CustomText(
+                      ////
                       title: item.body ?? "Description",
                       fontsize: 14.sp,
                       fontcolor: AppColor.blackColor,
