@@ -1,3 +1,4 @@
+import 'package:balochi_tutor/controllers/settings_controller/settings_controller.dart';
 import 'package:balochi_tutor/res/colors/app_color.dart';
 import 'package:balochi_tutor/res/routes/routes_name.dart';
 import 'package:balochi_tutor/screens/dashboard/home_page/notification_screen/notification_screen.dart';
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
     },
   ];
   final ProfileController profileController = Get.put(ProfileController());
+  final SettingsController settingsCont = Get.put(SettingsController());
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +134,29 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          InkWell(
-                              onTap: () {
-                                Get.to(() => NotificationScreen());
-                              },
-                              child: Icon(Icons.notifications, color: Colors.white, size: 28.sp)),
+                          Stack(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  settingsCont.markAllAsSeen(); // NEW
+                                  Get.to(() => NotificationScreen());
+                                },
+                                child: Icon(Icons.notifications, color: Colors.white, size: 28.sp),
+                              ),
+                              Obx(() {
+                                return settingsCont.hasNewNotification
+                                    ? Positioned(
+                                        right: 5,
+                                        top: 2,
+                                        child: CircleAvatar(
+                                          backgroundColor: AppColor.redColor,
+                                          radius: 4,
+                                        ),
+                                      )
+                                    : SizedBox();
+                              })
+                            ],
+                          ),
                         ],
                       ),
                     ],

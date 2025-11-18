@@ -10,6 +10,12 @@ class SettingsController extends GetxController with GetSingleTickerProviderStat
   var allowAppUpdates = false.obs;
   var notifications = <GetNotificationData>[].obs;
   var isLoading = false.obs;
+  var lastSeenNotificationId = 0.obs;
+
+  bool get hasNewNotification {
+    if (notifications.isEmpty) return false;
+    return notifications.first.id! > lastSeenNotificationId.value;
+  }
   //
   // @override
   // void onInit() {
@@ -51,6 +57,12 @@ class SettingsController extends GetxController with GetSingleTickerProviderStat
       }
     } catch (e) {
       Get.snackbar("Error", "Something went wrong: $e");
+    }
+  }
+
+  void markAllAsSeen() {
+    if (notifications.isNotEmpty) {
+      lastSeenNotificationId.value = notifications.first.id!;
     }
   }
 }

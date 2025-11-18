@@ -15,6 +15,9 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     controller.fetchNotifications(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.markAllAsSeen();
+    });
     return BackgroundWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -88,6 +91,15 @@ class NotificationScreen extends StatelessWidget {
                       fontsize: 14.sp,
                       fontcolor: AppColor.blackColor,
                     ),
+                    SizedBox(
+                      height: 4.h,
+                    ),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: CustomText(
+                            title: formatLocalTime(item.createdAt.toString()),
+                            fontsize: 12.sp,
+                            fontcolor: AppColor.blackColor)),
                   ],
                 ),
               );
@@ -96,5 +108,17 @@ class NotificationScreen extends StatelessWidget {
         }),
       ),
     );
+  }
+
+  String formatLocalTime(String utcString) {
+    try {
+      DateTime utcTime = DateTime.parse(utcString);
+      DateTime localTime = utcTime.toLocal();
+      return "${localTime.hour.toString().padLeft(2, '0')}:"
+          "${localTime.minute.toString().padLeft(2, '0')} :"
+          "${localTime.day}-${localTime.month}-${localTime.year}";
+    } catch (e) {
+      return utcString;
+    }
   }
 }
