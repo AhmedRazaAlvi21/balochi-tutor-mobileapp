@@ -27,7 +27,7 @@ class CourseController extends GetxController {
   var lessonDaysData = <LessonDaysData>[].obs;
   var completedLessonsData = <GetCompletedLessonsData>[].obs;
   var filteredLesson = <LessonDaysData>[].obs;
-  var courseDayData = <CourseDaysData>[].obs; // Changed to RxList
+  var courseDayData = <CourseDaysData>[].obs;
   var filteredCourse = <CourseDaysData>[].obs;
   var lessonContent = Rxn<LessonContentData>();
 
@@ -37,11 +37,12 @@ class CourseController extends GetxController {
   var errorMessage = ''.obs;
   var selectedCourse = "".obs;
   var selectedLesson = "".obs;
-  var selectedBalochiType = "Sulemani Balochi".obs;
+  var selectedBalochiType = "Sulemani dialect".obs;
   var isSpeaking = false.obs;
   var quizId = 0;
   bool hasFetchedCompletedLessons = false;
   var isDropdownExpanded = false.obs;
+  var completedQuizNumber = 0.obs;
 
   @override
   void onInit() {

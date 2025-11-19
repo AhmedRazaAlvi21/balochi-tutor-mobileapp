@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../../controllers/course_controller/course_controller.dart';
+import '../../../../models/course_model/lesson_day_response_model.dart';
 import '../../../../res/components/background_widget.dart';
 import '../../widget/gradient_dropdown.dart';
 
@@ -25,8 +26,50 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       courseController.fetchLessonContent(context, widget.lessonId ?? 0);
-      courseController.selectedBalochiType.value = "Sulemani Balochi";
+      courseController.selectedBalochiType.value = "Sulemani dialect";
     });
+  }
+
+  LessonDaysData? getPreviousLesson() {
+    final lessons = courseController.lessonDaysData;
+    if (lessons.isEmpty) return null;
+
+    // Find current lesson index based on order
+    final currentOrder = widget.order ?? 0;
+    final sortedLessons = List<LessonDaysData>.from(lessons)..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
+
+    final currentIndex = sortedLessons.indexWhere((lesson) => lesson.order == currentOrder);
+    if (currentIndex > 0 && currentIndex < sortedLessons.length) {
+      return sortedLessons[currentIndex - 1];
+    }
+    return null;
+  }
+
+  LessonDaysData? getNextLesson() {
+    final lessons = courseController.lessonDaysData;
+    if (lessons.isEmpty) return null;
+
+    // Find current lesson index based on order
+    final currentOrder = widget.order ?? 0;
+    final sortedLessons = List<LessonDaysData>.from(lessons)..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
+
+    final currentIndex = sortedLessons.indexWhere((lesson) => lesson.order == currentOrder);
+    if (currentIndex >= 0 && currentIndex < sortedLessons.length - 1) {
+      return sortedLessons[currentIndex + 1];
+    }
+    return null;
+  }
+
+  void navigateToLesson(LessonDaysData lesson) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LessonContentScreen(
+          lessonId: lesson.id,
+          order: lesson.order,
+        ),
+      ),
+    );
   }
 
   @override
@@ -52,10 +95,10 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
           String romanText = "";
           final selected = courseController.selectedBalochiType.value;
 
-          if (selected == "Sulemani Balochi") {
+          if (selected == "Sulemani dialect") {
             balochiText = lesson.sulemani ?? "";
             romanText = lesson.romanSulemani ?? "";
-          } else if (selected == "Makrani Balochi") {
+          } else if (selected == "Makrani dialect") {
             balochiText = lesson.makrani ?? "";
             romanText = lesson.romanMakrani ?? "";
           }
@@ -76,7 +119,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: GradientDropdown(
-                    options: ["Sulemani Balochi", "Makrani Balochi"],
+                    options: ["Sulemani dialect", "Makrani dialect"],
                     initialValue: selected,
                     onChanged: (value) {
                       courseController.selectedBalochiType.value = value;
@@ -89,14 +132,82 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 }, isRtl: true),
                 const SizedBox(height: 16),
                 _buildLanguageCard(
-                  selected == "Sulemani Balochi" ? "Roman Sulemani Balochi" : "Roman Makrani Balochi",
-                  romanText,
-                  () {
-                    courseController.speak(romanText, langType: selected);
-                    print("Makrani");
-                  },
-                ),
+                    selected == "Sulemani dialect" ? "Roman Sulemani dialect" : "Roman Makrani dialect", romanText, () {
+                  courseController.speak(romanText, langType: selected);
+                }, speaking: false),
                 const SizedBox(height: 30),
+                Obx(() {
+                  final previousLesson = getPreviousLesson();
+                  final nextLesson = getNextLesson();
+                  if (previousLesson == null && nextLesson == null) {
+                    return const SizedBox.shrink();
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: previousLesson != null
+                            ? InkWell(
+                                onTap: () => navigateToLesson(previousLesson),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.whiteColor,
+                                    borderRadius: BorderRadius.circular(16.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.arrow_back, color: const Color(0xFF7558FF), size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        "Previous",
+                                        style: TextStyle(
+                                          color: const Color(0xFF7558FF),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      if (previousLesson != null && nextLesson != null) SizedBox(width: 12),
+                      Expanded(
+                        child: nextLesson != null
+                            ? InkWell(
+                                onTap: () => navigateToLesson(nextLesson),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF7558FF),
+                                    borderRadius: BorderRadius.circular(16.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Next",
+                                        style: TextStyle(
+                                          color: AppColor.whiteColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.sp,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Icon(Icons.arrow_forward, color: AppColor.whiteColor, size: 20),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  );
+                }),
+                const SizedBox(height: 20),
                 InkWell(
                   onTap: () async {
                     await courseController.lessonCompleted(context, widget.lessonId ?? 0, "");
@@ -123,7 +234,8 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     );
   }
 
-  Widget _buildLanguageCard(String title, String text, GestureTapCallback onTap, {bool isRtl = false}) {
+  Widget _buildLanguageCard(String title, String text, GestureTapCallback onTap,
+      {bool isRtl = false, bool speaking = true}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -156,57 +268,59 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: isRtl ? MainAxisAlignment.start : MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        courseController.setSpeaking(title, true); // start animation
-                        await courseController.speak(text, langType: title);
-                        courseController.setSpeaking(title, false); // stop after speaking
-                      },
-                      child: Obx(() {
-                        final isSpeaking = courseController.isSpeakingFor(title);
+              speaking
+                  ? Row(
+                      mainAxisAlignment: isRtl ? MainAxisAlignment.start : MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: GestureDetector(
+                            onTap: () async {
+                              courseController.setSpeaking(title, true); // start animation
+                              await courseController.speak(text, langType: title);
+                              courseController.setSpeaking(title, false); // stop after speaking
+                            },
+                            child: Obx(() {
+                              final isSpeaking = courseController.isSpeakingFor(title);
 
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: isSpeaking
-                                  ? [Colors.greenAccent, Colors.green]
-                                  : [AppColor.primaryColor, AppColor.primary1],
-                            ),
-                            boxShadow: [
-                              if (isSpeaking)
-                                BoxShadow(
-                                  color: Colors.green.withOpacity(0.4),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(12),
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
-                            child: isSpeaking
-                                ? _PulsingIcon(key: ValueKey(true))
-                                : Icon(
-                                    Icons.volume_up,
-                                    key: ValueKey(false),
-                                    color: Colors.white,
-                                    size: 24,
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: isSpeaking
+                                        ? [Colors.greenAccent, Colors.green]
+                                        : [AppColor.primaryColor, AppColor.primary1],
                                   ),
+                                  boxShadow: [
+                                    if (isSpeaking)
+                                      BoxShadow(
+                                        color: Colors.green.withOpacity(0.4),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.all(12),
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 200),
+                                  child: isSpeaking
+                                      ? _PulsingIcon(key: ValueKey(true))
+                                      : Icon(
+                                          Icons.volume_up,
+                                          key: ValueKey(false),
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                ),
+                              );
+                            }),
                           ),
-                        );
-                      }),
-                    ),
-                  ),
-                ],
-              )
+                        ),
+                      ],
+                    )
+                  : SizedBox(height: 20.h)
             ],
           ),
         ),

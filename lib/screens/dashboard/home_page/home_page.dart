@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/profile_controller/profile_controller.dart';
+import '../../../res/assets/AppNetworkImage.dart';
 import '../../../res/assets/image_assets.dart';
 import '../../../res/components/app_assets_image.dart';
 import '../../../res/components/custom_text.dart';
@@ -249,11 +250,11 @@ class _HomePageState extends State<HomePage> {
                       childAspectRatio: 2,
                       children: [
                         _updateCard(ImageAssets.fireIcon, "Day ${dashboardData?.updates?.currentDay ?? ""}",
-                            "1.5 Hours Daily", false),
+                            "30 mins daily", false),
                         _updateCard(ImageAssets.calendarIcon, "${dashboardData?.updates?.lessonsPassed ?? ""}",
                             "Lessons Passed", false),
                         _updateCard(ImageAssets.target, "${dashboardData?.updates?.correctPractices ?? ""}",
-                            "Correct Practices", false),
+                            "Attempted Quiz", false),
                         _updateCard(ImageAssets.xP, "Quiz Passed", "${dashboardData?.updates?.quizPassed ?? ""}", true),
                       ],
                     ),
@@ -276,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                         subTitle: dashboardData?.recentlyDone?.description ?? "",
                         lesson: "${dashboardData?.recentlyDone?.order ?? '0'} Lessons",
                         words: "${dashboardData?.recentlyDone?.order ?? '0'} Words",
-                        image: dashboardData?.recentlyDone?.image,
+                        image: appNetworkImage(dashboardData?.recentlyDone?.image, 60, 60, BoxFit.cover),
                       ),
                     ],
                   ),
