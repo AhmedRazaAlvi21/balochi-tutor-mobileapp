@@ -176,15 +176,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                       CustomRoundButton(
-                                        title: loadingController.isLoading.value ? null : 'sign_in'.tr,
-                                        isLoading: loadingController.isLoading.value,
-                                        onPress: loadingController.isLoading.value
-                                            ? null
-                                            : () async {
-                                                if (formKey.currentState!.validate()) {
-                                                  await loginController.userLogin(context);
-                                                }
-                                              },
+                                        title: 'sign_in'.tr,
+                                        onPress: () async {
+                                          if (formKey.currentState!.validate()) {
+                                            await loginController.userLogin(context);
+                                          }
+                                        },
                                       ),
                                     ],
                                   )

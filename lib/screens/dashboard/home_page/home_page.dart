@@ -41,6 +41,19 @@ class _HomePageState extends State<HomePage> {
   ];
   final ProfileController profileController = Get.put(ProfileController());
   final SettingsController settingsCont = Get.put(SettingsController());
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (profileController.dashboardData.value == null) {
+        profileController.getDashboardData(context);
+      }
+      if (profileController.userProfileData.value == null) {
+        profileController.getUserProfileData(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

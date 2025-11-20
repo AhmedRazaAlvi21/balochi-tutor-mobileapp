@@ -17,13 +17,15 @@ class LoginService {
         email: loginController.emailController.text.trim(),
         password: loginController.passwordController.text,
         deviceToken: deviceToken,
+        deviceId: userDeviceId,
       );
-      debugPrint("VerifyOTPRequestModel: ${loginRequestModel.toJson()}");
+      debugPrint("Login RequestModel: ${loginRequestModel.toJson()}");
       var response = await Api().postRequest(context, AppUrl.loginApi, loginRequestModel.toJson());
-      debugPrint("VerifyOTPResponse: $response");
-      debugPrint("token: ${response}");
+      debugPrint("Login Response: $response");
+      debugPrint("token: $response");
+      debugPrint("user device id : $userDeviceId");
       LoginResponseModel responseModel = LoginResponseModel.fromJson(response);
-      debugPrint("VerifyOTPResponseModel: ${responseModel.toJson()}");
+      debugPrint("Login ResponseModel: ${responseModel.toJson()}");
       if (responseModel.success == true) {
         String? token = responseModel.token;
         await SharedPreferencesService().setString(KeysConstant.accessToken, token);

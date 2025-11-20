@@ -12,6 +12,7 @@ import '../../widget/course_complete_widget.dart';
 
 class LessonCompleteScreen extends StatelessWidget {
   const LessonCompleteScreen({super.key});
+
   String getDayNumberForLesson(GetCompletedLessonsData completedLesson, CourseController controller) {
     final lesson = controller.lessonDaysData.firstWhereOrNull(
       (l) => l.id == completedLesson.lessonId,

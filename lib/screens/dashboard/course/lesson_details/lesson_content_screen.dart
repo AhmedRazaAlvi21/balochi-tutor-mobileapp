@@ -208,24 +208,27 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                   );
                 }),
                 const SizedBox(height: 20),
-                InkWell(
-                  onTap: () async {
-                    await courseController.lessonCompleted(context, widget.lessonId ?? 0, "");
-                  },
-                  child: Center(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7558FF),
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      child: Text(
-                        "Completed",
-                        style: TextStyle(color: AppColor.whiteColor, fontWeight: FontWeight.bold),
+                SafeArea(
+                  child: InkWell(
+                    onTap: () async {
+                      await courseController.lessonCompleted(context, widget.lessonId ?? 0, "");
+                    },
+                    child: Center(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7558FF),
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        child: Text(
+                          "Completed",
+                          style: TextStyle(color: AppColor.whiteColor, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
                 ),
+                SizedBox(height: 10.h),
               ],
             ),
           );

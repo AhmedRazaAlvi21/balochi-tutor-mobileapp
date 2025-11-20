@@ -1,5 +1,6 @@
 import 'package:balochi_tutor/controllers/settings_controller/settings_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 
@@ -90,28 +91,31 @@ class Notifications extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 30),
-              child: CustomRoundButton(
-                title: 'update_notifications'.tr,
-                isLoading: false,
-                onPress: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return ProfileDialogBox(
-                        continueButton: 'Update'.tr,
-                        onTap: () async {
-                          Get.back();
-                          await settingsController.updateNotification(context);
-                        },
-                        text: "Are you sure you want to update the notifications?",
-                      );
-                    },
-                  );
-                },
+            SafeArea(
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 30),
+                child: CustomRoundButton(
+                  title: 'update_notifications'.tr,
+                  isLoading: false,
+                  onPress: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return ProfileDialogBox(
+                          continueButton: 'Update'.tr,
+                          onTap: () async {
+                            Get.back();
+                            await settingsController.updateNotification(context);
+                          },
+                          text: "Are you sure you want to update the notifications?",
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
+            SizedBox(height: 20.h),
           ],
         ),
       ),

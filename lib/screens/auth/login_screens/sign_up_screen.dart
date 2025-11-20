@@ -187,8 +187,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       ),
                                     ),
                                     CustomRoundButton(
-                                      title: loadingController.isLoading.value ? null : 'sign_up'.tr,
-                                      isLoading: loadingController.isLoading.value,
+                                      // title: loadingController.isLoading.value ? null : 'sign_up'.tr,
+                                      // isLoading: loadingController.isLoading.value,
+                                      title: 'sign_up'.tr,
                                       onPress:
                                           //     () async {
                                           //   if (formKey.currentState!.validate()) {
@@ -200,45 +201,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           //     Get.toNamed(RouteName.dashboardScreen);
                                           //   }
                                           // },
-                                          loadingController.isLoading.value
-                                              ? null
-                                              : () async {
-                                                  loadingController.setLoading(true);
-                                                  if (formKey.currentState!.validate()) {
-                                                    try {
-                                                      String email = loginController.emailController.text;
-                                                      registerController.defaultName.value =
-                                                          email.contains('@') ? email.split('@')[0] : email;
-                                                      final response =
-                                                          await SignupService().callSignupService(context, false);
-                                                      if (response.responseData?.code == 200 ||
-                                                          response.responseData?.code == 201) {
-                                                        Utils.toastMessage(
-                                                            context, "${response.responseData?.message}", true);
-                                                        Future.delayed(const Duration(seconds: 2), () {
-                                                          Get.toNamed(RouteName.confirmOtpScreen);
-                                                        });
-                                                        registerController.emailController.text =
-                                                            loginController.emailController.text;
-                                                      } else if (response.responseData?.error != null) {
-                                                        if (response.responseData?.error == "Validation Error") {
-                                                          Utils.toastMessage(context,
-                                                              "${response.responseData!.getErrorMessage()}", false);
-                                                        } else {
-                                                          Utils.toastMessage(context,
-                                                              "${response.responseData?.getErrorMessage()}", false);
-                                                        }
-                                                      } else {
-                                                        Utils.toastMessage(
-                                                            context, "Signup failed. Please try again.", false);
-                                                      }
-                                                    } catch (error) {
-                                                      Utils.toastMessage(context, "An error occurred: $error", false);
-                                                    } finally {
-                                                      loadingController.setLoading(false);
-                                                    }
-                                                  }
-                                                },
+                                          // loadingController.isLoading.value
+                                          //     ? null
+                                          //     :
+                                          () async {
+                                        loadingController.setLoading(true);
+                                        if (formKey.currentState!.validate()) {
+                                          try {
+                                            String email = loginController.emailController.text;
+                                            registerController.defaultName.value =
+                                                email.contains('@') ? email.split('@')[0] : email;
+                                            final response = await SignupService().callSignupService(context, false);
+                                            if (response.responseData?.code == 200 ||
+                                                response.responseData?.code == 201) {
+                                              Utils.toastMessage(context, "${response.responseData?.message}", true);
+                                              Future.delayed(const Duration(seconds: 2), () {
+                                                Get.toNamed(RouteName.confirmOtpScreen);
+                                              });
+                                              registerController.emailController.text =
+                                                  loginController.emailController.text;
+                                            } else if (response.responseData?.error != null) {
+                                              if (response.responseData?.error == "Validation Error") {
+                                                Utils.toastMessage(
+                                                    context, "${response.responseData!.getErrorMessage()}", false);
+                                              } else {
+                                                Utils.toastMessage(
+                                                    context, "${response.responseData?.getErrorMessage()}", false);
+                                              }
+                                            } else {
+                                              Utils.toastMessage(context, "Signup failed. Please try again.", false);
+                                            }
+                                          } catch (error) {
+                                            Utils.toastMessage(context, "An error occurred: $error", false);
+                                          } finally {
+                                            loadingController.setLoading(false);
+                                          }
+                                        }
+                                      },
                                     ),
                                   ],
                                 )

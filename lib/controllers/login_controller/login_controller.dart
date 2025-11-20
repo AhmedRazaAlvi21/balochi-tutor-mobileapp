@@ -62,10 +62,11 @@ class LoginController extends GetxController {
     try {
       final response = await LoginService().callLoginService(context);
 
+      print("code ============== ${response.responseData?.code}");
+      print("msg ============== ${response.responseData?.message}");
+      print("success ============== ${response.responseData?.success}");
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         Utils.toastMessage(context, "${response.responseData?.message}", true);
-
-        // ✅ If OTP required, go to OTP screen
         if (response.responseData?.success == true &&
             (response.responseData?.message == "OTP sent again." || response.responseData?.message == "OTP sent.")) {
           Future.delayed(const Duration(seconds: 2), () {
@@ -77,8 +78,13 @@ class LoginController extends GetxController {
             Get.offAllNamed(RouteName.dashboardScreen);
           });
         }
+      } else if (response.responseData?.code == 403) {
+        Utils.toastMessage(context, "You have reached the maximum number of devices allowed.", false);
       } else {
-        Utils.toastMessage(context, "${response.responseData?.message}", false);
+        Utils.toastMessage(
+            context,
+            "You have reached the maximum number of devices allowed. Please contact support to manage your devices.",
+            false);
       }
     } catch (error) {
       Utils.toastMessage(context, "An error occurred: $error", false);
