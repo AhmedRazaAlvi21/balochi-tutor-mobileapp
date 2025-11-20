@@ -107,7 +107,7 @@ class _CourseScreenState extends State<CourseScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('No courses available at this time.'),
+                      const Text('No courses available at this time.  '),
                       TextButton(
                         onPressed: () async {
                           await courseController.getCourseDayData(context);
