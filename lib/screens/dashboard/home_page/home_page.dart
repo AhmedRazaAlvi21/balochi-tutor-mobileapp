@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 
 import '../../../controllers/profile_controller/profile_controller.dart';
 import '../../../res/assets/AppNetworkImage.dart';
+import '../../../res/assets/CacheImageWidget.dart';
 import '../../../res/assets/image_assets.dart';
 import '../../../res/components/app_assets_image.dart';
 import '../../../res/components/custom_text.dart';
@@ -41,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   ];
   final ProfileController profileController = Get.put(ProfileController());
   final SettingsController settingsCont = Get.put(SettingsController());
+
   @override
   void initState() {
     super.initState();
@@ -83,56 +85,40 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 25.r,
-                            backgroundColor: Colors.white,
-                            child: (dashboardData?.user?.userImg != null && dashboardData!.user!.userImg!.isNotEmpty)
-                                ? ClipOval(
-                                    child: Image.network(
-                                      dashboardData.user!.userImg!,
-                                      fit: BoxFit.cover,
-                                      width: 50.w,
-                                      height: 50.h,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        // If image fails to load
-                                        return Icon(
-                                          Icons.person,
-                                          size: 30.sp,
-                                          color: AppColor.greyColor,
-                                        );
-                                      },
+                      Expanded(
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 25.r,
+                              backgroundColor: Colors.white,
+                              child: (dashboardData?.user?.userImg != null && dashboardData!.user!.userImg!.isNotEmpty)
+                                  ? ClipOval(
+                                      child: cacheImageWidget(
+                                        dashboardData.user!.userImg!,
+                                        50.w,
+                                        50.h,
+                                        BoxFit.cover,
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.person,
+                                      size: 50.sp,
+                                      color: AppColor.greyColor,
                                     ),
-                                  )
-                                : Icon(
-                                    Icons.person,
-                                    size: 50.sp,
-                                    color: AppColor.greyColor,
-                                  ),
-                          ),
-                          SizedBox(width: 10.w),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                dashboardData?.user?.name ?? "user 1",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: CustomText(
+                                title: dashboardData?.user?.name ?? "user 1",
+                                fontcolor: AppColor.whiteColor,
+                                fontsize: 18.sp,
+                                fontweight: FontWeight.w700,
+                                maxline: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              Text(
-                                "User ID: 002323",
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12.sp,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                       Row(
                         children: [
@@ -178,8 +164,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: 15.h),
-
-              // --- Carousel Section ---
               Stack(
                 children: [
                   CarouselSlider(
@@ -222,8 +206,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-
-              // --- Updates Section ---
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
@@ -274,8 +256,6 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-
-              // --- Recently Done Section ---
               if (dashboardData?.recentlyDone != null)
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.w),

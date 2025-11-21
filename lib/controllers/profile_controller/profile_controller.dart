@@ -86,10 +86,10 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> getUserProfileData(BuildContext context) async {
-    // if (isDataFetched.value) {
-    //   print("✅ Profile data already fetched — skipping API call");
-    //   return;
-    // }
+    if (isDataFetched.value) {
+      print("✅ Profile data already fetched — skipping API call");
+      return;
+    }
 
     try {
       isLoading.value = true;
@@ -112,7 +112,7 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
           print("🖼️ Profile image URL from API: $imageUrl");
           userProfileData.value?.userImg = imageUrl;
         }
-        // isDataFetched.value = true;
+        isDataFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
         //Utils.toastMessage(context, errorMessage.value, false);

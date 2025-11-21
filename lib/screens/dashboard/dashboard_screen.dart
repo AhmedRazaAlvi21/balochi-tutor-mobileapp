@@ -18,7 +18,13 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        return Utils.onwillPopFunc(context);
+        final controller = Get.find<DashboardController>();
+        if (controller.currentIndex == 0) {
+          return Utils.onwillPopFunc(context);
+        } else {
+          controller.onTabTapped(0);
+          return false;
+        }
       },
       child: GetBuilder<DashboardController>(
           init: DashboardController(),

@@ -46,111 +46,110 @@ class RegisterEmailScreen extends StatelessWidget {
         body: Column(
           children: [
             Expanded(
-                child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Stack(
-                          children: [
-                            SizedBox(
-                              width: 70.w,
-                              height: 70.h,
-                              child: Obx(
-                                () => registerController.profilePicturePath.value == ''
-                                    ? CircleAvatar(
-                                        foregroundImage: AssetImage(ImageAssets.person2),
-                                        child: Icon(
-                                          Icons.person,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            children: [
+                              SizedBox(
+                                width: 70.w,
+                                height: 70.h,
+                                child: Obx(
+                                  () => registerController.profilePicturePath.value == ''
+                                      ? CircleAvatar(
+                                          foregroundImage: AssetImage(ImageAssets.person2),
+                                          child: Icon(
+                                            Icons.person,
+                                          ),
+                                        )
+                                      : CircleAvatar(
+                                          foregroundImage: FileImage(File(registerController.profilePicturePath.value)),
+                                          child: Icon(
+                                            Icons.person,
+                                          ),
                                         ),
-                                      )
-                                    : CircleAvatar(
-                                        foregroundImage: FileImage(File(registerController.profilePicturePath.value)),
-                                        child: Icon(
-                                          Icons.person,
-                                        ),
-                                      ),
+                                ),
                               ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              // alignment: Alignment.topCenter,
-                              child: CustomImagePickerWidget(),
-                            ),
-                          ],
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                // alignment: Alignment.topCenter,
+                                child: CustomImagePickerWidget(),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 20.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                title: registerController.nameController.text,
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 20.sp,
+                                fontweight: FontWeight.w700,
+                              ),
+                              CustomText(
+                                title: 'abc@yourdomain.com',
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 14.sp,
+                                fontweight: FontWeight.w500,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 20.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          title: 'email_screen_text'.tr,
+                          fontcolor: AppColor.blackColor,
+                          fontsize: 26.sp,
+                          fontweight: FontWeight.w700,
                         ),
-                        SizedBox(width: 20.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(
-                              title: registerController.nameController.text,
-                              fontcolor: AppColor.blackColor,
-                              fontsize: 20.sp,
-                              fontweight: FontWeight.w700,
-                            ),
-                            CustomText(
-                              title: 'abc@yourdomain.com',
-                              fontcolor: AppColor.blackColor,
-                              fontsize: 14.sp,
-                              fontweight: FontWeight.w500,
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: CustomText(
-                        title: 'email_screen_text'.tr,
-                        fontcolor: AppColor.blackColor,
-                        fontsize: 26.sp,
-                        fontweight: FontWeight.w700,
                       ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: CustomText(
-                        title: 'email'.tr,
-                        fontcolor: AppColor.black121,
-                        fontweight: FontWeight.w700,
+                      SizedBox(height: 20.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          title: 'email'.tr,
+                          fontcolor: AppColor.black121,
+                          fontweight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                    CustomFormField(
-                      title: '',
-                      onchange: (val) {
-                        if (val.toString().isNotEmpty && registerController.emailRegex.hasMatch(val!)) {
-                          registerController.emailValidate.value = true;
-                        } else {
-                          registerController.emailValidate.value = false;
-                        }
-                      },
-                      validator: (val) {
-                        if (val.isEmpty) {
-                          return "required";
-                        }
-                        if (!registerController.emailRegex.hasMatch(val!)) {
-                          return "Invalid email address";
-                        }
-                      },
-                      // focusnode: controller.nameFocusNode,
-                      fieldcontroller: registerController.emailController,
-                    ),
-                    SizedBox(
-                      height: context.blockSizeHorizontal * 5,
-                    ),
-                  ],
+                      CustomFormField(
+                        title: '',
+                        onchange: (val) {
+                          if (val.toString().isNotEmpty && registerController.emailRegex.hasMatch(val!)) {
+                            registerController.emailValidate.value = true;
+                          } else {
+                            registerController.emailValidate.value = false;
+                          }
+                        },
+                        validator: (val) {
+                          if (val.isEmpty) {
+                            return "required";
+                          }
+                          if (!registerController.emailRegex.hasMatch(val!)) {
+                            return "Invalid email address";
+                          }
+                        },
+                        // focusnode: controller.nameFocusNode,
+                        fieldcontroller: registerController.emailController,
+                      ),
+                      SizedBox(
+                        height: context.blockSizeHorizontal * 5,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            )),
+            ),
             Obx(
               () => registerController.emailValidate.value
                   ? SafeArea(

@@ -24,7 +24,6 @@ class RegisterAgeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BackgroundWidget(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           leading: Padding(

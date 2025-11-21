@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/course_controller/course_controller.dart';
+import '../../../controllers/dashboard_controller/dashboard_controller.dart';
 import '../../../res/assets/AppNetworkImage.dart';
 import '../../../res/components/SearchDropdown/SearchDropdownTextField.dart';
 import '../../../res/components/custom_text.dart';
@@ -49,6 +50,12 @@ class _CourseScreenState extends State<CourseScreen> {
           ),
         ),
         automaticallyImplyLeading: false,
+        leading: InkWell(
+            onTap: () {
+              final controller = Get.find<DashboardController>();
+              controller.onTabTapped(0);
+            },
+            child: Icon(Icons.arrow_back)),
       ),
       body: Column(
         children: [
@@ -139,10 +146,7 @@ class _CourseScreenState extends State<CourseScreen> {
                       itemBuilder: (context, index) {
                         final course = courseList[index];
                         final day = course.dayNumber ?? index + 1;
-
-                        /// Check if THIS is the first locked day
                         bool isFirstLockedDay = false;
-
                         if (course.isLocked == true) {
                           if (index == 0) {
                             isFirstLockedDay = true;
@@ -153,22 +157,15 @@ class _CourseScreenState extends State<CourseScreen> {
                             }
                           }
                         }
-
-                        /// SHOW QUIZ ONLY ON FIRST LOCKED DAY
-                        /// SHOW QUIZ + DAY CARD BOTH
                         if (isFirstLockedDay) {
                           int quizNumber = getQuizNumber(day);
-
                           return Column(
                             children: [
-                              /// QUIZ WIDGET
                               showQuizWidget(
                                 quizNumber: quizNumber,
                                 quizId: courseController.quizId,
                                 message: "Complete Quiz $quizNumber to unlock next days",
                               ),
-
-                              /// ACTUAL LOCKED DAY CARD (DAY 15 etc)
                               InkWell(
                                 onTap: () {},
                                 child: CourseCardWidget(
@@ -176,7 +173,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                   title: "Day $day",
                                   subTitle: course.title ?? 'Balochi',
                                   lesson: course.lessonsCount == null ? "" : "${course.lessonsCount ?? 0} Lessons",
-                                  image: appNetworkImage(course.image, 60, 60, BoxFit.cover),
+                                  image: appNetworkImage(course.image, 100.w, 100.h, BoxFit.cover),
                                   isLocked: true,
                                 ),
                               ),
@@ -193,7 +190,7 @@ class _CourseScreenState extends State<CourseScreen> {
                             title: "Day $day",
                             subTitle: course.title ?? 'Balochi',
                             lesson: course.lessonsCount == null ? "" : "${course.lessonsCount ?? 0} Lessons",
-                            image: appNetworkImage(course.image, 100, 100, BoxFit.cover),
+                            image: appNetworkImage(course.image, 100.w, 100.h, BoxFit.cover),
                             isLocked: course.isLocked ?? false,
                           ),
                         );

@@ -1,4 +1,5 @@
 import 'package:balochi_tutor/service/notification_service/update_notification_service.dart';
+import 'package:balochi_tutor/service/privacy_policy_service/privacy_policy_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,17 +12,43 @@ class SettingsController extends GetxController with GetSingleTickerProviderStat
   var notifications = <GetNotificationData>[].obs;
   var isLoading = false.obs;
   var lastSeenNotificationId = 0.obs;
+  final Map<String, String> _policyCache = {};
+  var policy = RxnString();
+
+  Future<void> fetchPrivacyPolicyData(BuildContext context, String slug) async {
+    if (slug.isEmpty) {
+      debugPrint("❌ Error: slug is empty");
+      return;
+    }
+    if (_policyCache.containsKey(slug)) {
+      policy.value = _policyCache[slug];
+      debugPrint("✅ Loaded $slug from cache");
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      final response = await PrivacyPolicyService().callPrivacyPolicyService(context, slug);
+      final success = response.responseData?.success ?? false;
+      final data = response.responseData?.data;
+      if (success && data != null) {
+        policy.value = data;
+        _policyCache[slug] = data;
+        debugPrint("📄 Cached $slug successfully");
+      } else {
+        Get.snackbar("Error", response.message ?? "Failed to load $slug");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   bool get hasNewNotification {
     if (notifications.isEmpty) return false;
     return notifications.first.id! > lastSeenNotificationId.value;
   }
-  //
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   fetchNotifications(Contect);
-  // }
 
   void toggleNotifications(bool value) {
     allowNotifications.value = value;

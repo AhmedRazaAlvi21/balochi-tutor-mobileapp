@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../controllers/dashboard_controller/dashboard_controller.dart';
 import '../../../controllers/profile_controller/profile_controller.dart';
 import '../../../main.dart';
 import '../../../res/colors/app_color.dart';
@@ -27,10 +28,16 @@ class SettingScreen extends StatelessWidget {
                 title: 'Settings'.tr,
                 fontcolor: AppColor.blackColor,
                 textalign: TextAlign.center,
-                fontsize: 20,
+                fontsize: 24.sp,
                 fontweight: FontWeight.w700,
               ),
-              automaticallyImplyLeading: false,
+              //automaticallyImplyLeading: false,
+              leading: InkWell(
+                  onTap: () {
+                    final controller = Get.find<DashboardController>();
+                    controller.onTabTapped(0);
+                  },
+                  child: Icon(Icons.arrow_back)),
             ),
             body: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
