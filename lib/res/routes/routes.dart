@@ -16,13 +16,9 @@ import '../../screens/auth/register_screens/register_name_screen.dart';
 import '../../screens/auth/register_screens/register_password_screen.dart';
 import '../../screens/auth/splash_screen.dart';
 import '../../screens/dashboard/course/lesson_details/lesson_complete_screen.dart';
-import '../../screens/dashboard/course/lesson_details/lesson_content_screen.dart';
 import '../../screens/dashboard/course/lesson_screen.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
 import '../../screens/dashboard/setting/about/about_screen.dart';
-import '../../screens/dashboard/setting/about/privacy_policy_screen.dart';
-import '../../screens/dashboard/setting/about/subscription_info_screen.dart';
-import '../../screens/dashboard/setting/about/terms_screen.dart';
 import '../../screens/dashboard/setting/notifications.dart';
 import '../../screens/dashboard/setting/personal_info/personal_info.dart';
 import '../../screens/dashboard/subscription_plan/payment_successful.dart';
@@ -46,18 +42,13 @@ class AppRoutes {
         GetPage(name: RouteName.createNewPasswordScreen, page: () => CreateNewPasswordScreen()),
         GetPage(name: RouteName.dashboardScreen, page: () => DashboardScreen()),
         GetPage(name: RouteName.lessonScreen, page: () => LessonScreen()),
-        GetPage(name: RouteName.lessonContentScreen, page: () => LessonContentScreen()),
         GetPage(name: RouteName.lessonCompleteScreen, page: () => LessonCompleteScreen()),
         GetPage(name: RouteName.settingScreen, page: () => SettingScreen()),
         GetPage(name: RouteName.personalInfo, page: () => PersonalInfo()),
         GetPage(name: RouteName.notifications, page: () => Notifications()),
         GetPage(name: RouteName.aboutScreen, page: () => AboutScreen()),
-        GetPage(name: RouteName.privacyPolicyScreen, page: () => PrivacyPolicyScreen()),
-        GetPage(name: RouteName.termsScreen, page: () => TermsScreen()),
-        GetPage(name: RouteName.subscriptionInfoScreen, page: () => SubscriptionInfoScreen()),
         GetPage(name: RouteName.subscriptionPlan, page: () => SubscriptionPlan()),
         GetPage(name: RouteName.subscriptionPlanInfo, page: () => SubscriptionPlanInfo()),
         GetPage(name: RouteName.paymentSuccessful, page: () => PaymentSuccessful()),
-        //GetPage(name: RouteName.resultScreen, page: () => ResultScreen()),
       ];
 }

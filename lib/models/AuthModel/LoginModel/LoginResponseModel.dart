@@ -14,11 +14,11 @@ class LoginResponseModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
-    data['token'] = this.token;
-    data['code'] = this.code;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['message'] = message;
+    data['token'] = token;
+    data['code'] = code;
     return data;
   }
 }

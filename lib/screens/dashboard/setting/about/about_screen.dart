@@ -1,11 +1,12 @@
+import 'package:balochi_tutor/screens/dashboard/setting/about/policy_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../../controllers/profile_controller/profile_controller.dart';
 import '../../../../res/colors/app_color.dart';
 import '../../../../res/components/background_widget.dart';
 import '../../../../res/components/custom_text.dart';
-import '../../../../res/routes/routes_name.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -24,7 +25,7 @@ class AboutScreen extends StatelessWidget {
             title: 'About',
             fontcolor: AppColor.blackColor,
             textalign: TextAlign.center,
-            fontsize: 20,
+            fontsize: 24.sp,
             fontweight: FontWeight.w700,
           ),
         ),
@@ -39,11 +40,11 @@ class AboutScreen extends StatelessWidget {
                   return ListTile(
                     onTap: () {
                       if (index == 0) {
-                        Get.toNamed(RouteName.privacyPolicyScreen);
+                        Get.to(() => PolicyScreen(slug: 'policy', title: 'Privacy Policy'));
                       } else if (index == 1) {
-                        Get.toNamed(RouteName.termsScreen);
+                        Get.to(() => PolicyScreen(slug: 'terms', title: 'Terms of services'));
                       } else {
-                        Get.toNamed(RouteName.subscriptionInfoScreen);
+                        Get.to(() => PolicyScreen(slug: 'manage-subscription', title: 'Manage subscription'));
                       }
                     },
                     contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),

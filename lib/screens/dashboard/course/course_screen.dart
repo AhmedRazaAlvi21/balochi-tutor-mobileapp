@@ -5,8 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/course_controller/course_controller.dart';
-import '../../../res/assets/image_assets.dart';
+import '../../../controllers/dashboard_controller/dashboard_controller.dart';
+import '../../../res/assets/AppNetworkImage.dart';
 import '../../../res/components/SearchDropdown/SearchDropdownTextField.dart';
+import '../../../res/components/custom_text.dart';
+import '../../../res/components/gradientButtonWidget/gradient_button_widget.dart';
+import '../quiz/quiz_screen.dart';
 import 'lesson_screen.dart';
 
 class CourseScreen extends StatefulWidget {
@@ -24,7 +28,6 @@ class _CourseScreenState extends State<CourseScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Only fetch if course list is empty
       if (courseController.courseDayData.isEmpty) {
         courseController.getCourseDayData(context);
       }
@@ -47,10 +50,15 @@ class _CourseScreenState extends State<CourseScreen> {
           ),
         ),
         automaticallyImplyLeading: false,
+        leading: InkWell(
+            onTap: () {
+              final controller = Get.find<DashboardController>();
+              controller.onTabTapped(0);
+            },
+            child: Icon(Icons.arrow_back)),
       ),
       body: Column(
         children: [
-          // 🔍 Search Dropdown
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w) + EdgeInsets.only(bottom: 12.h),
             child: SearchDropDownTextField(
@@ -64,23 +72,33 @@ class _CourseScreenState extends State<CourseScreen> {
                 color: AppColor.greyColor,
               ),
               items: (filter, _) {
-                final list = courseController.courseDayData ?? [];
-                final allTitles = list
-                    .where((c) => "day ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase()))
-                    .map((c) => "Day ${c.dayNumber}")
-                    .toList();
-
+                final list = courseController.courseDayData.toList();
+                final allTitles = <String>[];
                 if (!allTitles.contains("All Days")) {
                   allTitles.insert(0, "All Days");
                 }
+                final filteredTitles = list
+                    .where((c) {
+                      final dayMatch = "Days ${c.dayNumber}".toLowerCase().contains(filter.toLowerCase());
+                      final titleMatch = (c.title?.toLowerCase().contains(filter.toLowerCase()) ?? false);
+                      return dayMatch || titleMatch;
+                    })
+                    .map((c) => "Days ${c.dayNumber}")
+                    .toList();
+
+                allTitles.addAll(filteredTitles);
                 return allTitles;
               },
               onChange: (value) {
                 if (value == "All Days" || value.isEmpty) {
                   courseController.filteredCourse.clear();
+                  courseController.update(['course_list']);
                 } else {
-                  courseController.selectCourse(value);
-                  courseController.onSearchCourse(value);
+                  final searchTerm = value.replaceAll("Days ", "").trim();
+                  final allCourses = courseController.courseDayData;
+                  courseController.filteredCourse.value =
+                      allCourses.where((course) => course.dayNumber.toString().contains(searchTerm)).toList();
+                  courseController.update(['course_list']);
                 }
               },
               validator: (value) => value != null && value.isNotEmpty ? null : "Please select a course",
@@ -91,13 +109,12 @@ class _CourseScreenState extends State<CourseScreen> {
               if (courseController.isLoading.value && courseController.courseDayData.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
-
               if (courseController.errorMessage.isNotEmpty && courseController.courseDayData.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('No courses available at this time.'),
+                      const Text('No courses available at this time.  '),
                       TextButton(
                         onPressed: () async {
                           await courseController.getCourseDayData(context);
@@ -108,11 +125,9 @@ class _CourseScreenState extends State<CourseScreen> {
                   ),
                 );
               }
-
               final courseList = courseController.filteredCourse.isNotEmpty
                   ? courseController.filteredCourse
-                  : (courseController.courseDayData ?? []);
-
+                  : courseController.courseDayData.toList();
               if (courseList.isEmpty) {
                 return const Center(child: Text('No courses available'));
               }
@@ -125,30 +140,61 @@ class _CourseScreenState extends State<CourseScreen> {
                     await courseController.getCourseDayData(context);
                   },
                   child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: courseList.length,
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
-                    itemBuilder: (context, index) {
-                      final course = courseList[index];
-                      debugPrint("Course ID: ${course.id}");
-                      debugPrint("Course isLocked: ${course.isLocked}");
-                      return InkWell(
-                        onTap: () async {
-                          if (isNavigating) return;
-                          isNavigating = true;
-                          Get.to(() => LessonScreen(courseId: course.id ?? 0));
-                          isNavigating = false;
-                        },
-                        child: CourseCardWidget(
-                          done: false,
-                          title: "Day ${course.dayNumber}",
-                          subTitle: course.title ?? 'Balochi',
-                          image: ImageAssets.courseImage,
-                          isLocked: course.isLocked,
-                        ),
-                      );
-                    },
-                  ),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: courseList.length,
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      itemBuilder: (context, index) {
+                        final course = courseList[index];
+                        final day = course.dayNumber ?? index + 1;
+                        bool isFirstLockedDay = false;
+                        if (course.isLocked == true) {
+                          if (index == 0) {
+                            isFirstLockedDay = true;
+                          } else {
+                            final previous = courseList[index - 1];
+                            if (previous.isLocked == false) {
+                              isFirstLockedDay = true;
+                            }
+                          }
+                        }
+                        if (isFirstLockedDay) {
+                          int quizNumber = getQuizNumber(day);
+                          return Column(
+                            children: [
+                              showQuizWidget(
+                                quizNumber: quizNumber,
+                                quizId: courseController.quizId,
+                                message: "Complete Quiz $quizNumber to unlock next days",
+                              ),
+                              InkWell(
+                                onTap: () {},
+                                child: CourseCardWidget(
+                                  done: false,
+                                  title: "Day $day",
+                                  subTitle: course.title ?? 'Balochi',
+                                  lesson: course.lessonsCount == null ? "" : "${course.lessonsCount ?? 0} Lessons",
+                                  image: appNetworkImage(course.image, 100.w, 100.h, BoxFit.cover),
+                                  isLocked: true,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                        return InkWell(
+                          onTap: () {
+                            if (course.isLocked == true) return;
+                            Get.to(() => LessonScreen(courseId: course.id ?? 0));
+                          },
+                          child: CourseCardWidget(
+                            done: false,
+                            title: "Day $day",
+                            subTitle: course.title ?? 'Balochi',
+                            lesson: course.lessonsCount == null ? "" : "${course.lessonsCount ?? 0} Lessons",
+                            image: appNetworkImage(course.image, 100.w, 100.h, BoxFit.cover),
+                            isLocked: course.isLocked ?? false,
+                          ),
+                        );
+                      }),
                 ),
               );
             }),
@@ -156,5 +202,74 @@ class _CourseScreenState extends State<CourseScreen> {
         ],
       ),
     );
+  }
+
+  Widget showQuizWidget({
+    required int quizNumber,
+    required int quizId,
+    required String message,
+  }) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20.w),
+          decoration: BoxDecoration(
+            color: AppColor.whiteColor,
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.lock, size: 60, color: Colors.black),
+                  SizedBox(width: 5.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          title: 'Quiz: $quizNumber',
+                          fontcolor: AppColor.blackColor,
+                          fontsize: 18.sp,
+                          fontweight: FontWeight.w700,
+                        ),
+                        SizedBox(height: 8.h),
+                        CustomText(
+                          title: message,
+                          fontcolor: AppColor.blackColor,
+                          fontsize: 14.sp,
+                          fontweight: FontWeight.w400,
+                        ),
+                        SizedBox(height: 20.h),
+                        GradientButtonWidget(
+                          width: 150.w,
+                          padding: EdgeInsets.zero,
+                          title: "Start Quiz",
+                          onTap: () {
+                            Get.to(() => QuizScreen(quizId: quizId));
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool isQuizDay(int day) {
+    if (day == 1) return false;
+    return (day - 1) % 7 == 0;
+  }
+
+  int getQuizNumber(int day) {
+    return ((day - 1) / 7).floor();
   }
 }

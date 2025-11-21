@@ -24,7 +24,6 @@ class RegisterAgeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BackgroundWidget(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           leading: Padding(
@@ -46,127 +45,126 @@ class RegisterAgeScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    SizedBox(
-                      width: context.blockSizeHorizontal * 20,
-                      height: context.blockSizeHorizontal * 20,
-                      child: Obx(
-                        () => registerController.profilePicturePath.value == ''
-                            ? CircleAvatar(
-                                foregroundImage: AssetImage(ImageAssets.person2),
-                                child: Icon(
-                                  Icons.person,
-                                ),
-                              )
-                            : CircleAvatar(
-                                foregroundImage: FileImage(File(registerController.profilePicturePath.value)),
-                                child: Icon(
-                                  Icons.person,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            children: [
+                              SizedBox(
+                                width: 70.w,
+                                height: 80.h,
+                                child: Obx(
+                                  () => registerController.profilePicturePath.value == ''
+                                      ? CircleAvatar(
+                                          foregroundImage: AssetImage(ImageAssets.person2),
+                                          child: Icon(
+                                            Icons.person,
+                                          ),
+                                        )
+                                      : CircleAvatar(
+                                          foregroundImage: FileImage(File(registerController.profilePicturePath.value)),
+                                          child: Icon(
+                                            Icons.person,
+                                          ),
+                                        ),
                                 ),
                               ),
+                              Positioned(
+                                bottom: 5,
+                                right: 5,
+                                // alignment: Alignment.topCenter,
+                                child: CustomImagePickerWidget(),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                title: registerController.nameController.text,
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 20.sp,
+                                fontweight: FontWeight.w700,
+                              ),
+                              CustomText(
+                                title: 'abc@yourdomain.com',
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 14.sp,
+                                fontweight: FontWeight.w500,
+                              ),
+                            ],
+                          )
+                        ],
                       ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      // alignment: Alignment.topCenter,
-                      child: CustomImagePickerWidget(),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      title: registerController.nameController.text,
-                      fontcolor: AppColor.blackColor,
-                      fontsize: 20.sp,
-                      fontweight: FontWeight.w700,
-                    ),
-                    CustomText(
-                      title: 'abc@yourdomain.com',
-                      fontcolor: AppColor.blackColor,
-                      fontsize: 14.sp,
-                      fontweight: FontWeight.w500,
-                    ),
-                  ],
-                )
-              ],
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: CustomText(
-                  title: 'age_screen_text'.tr,
-                  fontcolor: AppColor.blackColor,
-                  fontsize: 20.sp,
-                  fontweight: FontWeight.w700,
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 10.0,
-                ),
-                child: CustomText(
-                  title: 'age'.tr,
-                  fontcolor: AppColor.blackColor,
-                  fontweight: FontWeight.w700,
+                      SizedBox(height: 20.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          title: 'age_screen_text'.tr,
+                          fontcolor: AppColor.blackColor,
+                          fontsize: 26.sp,
+                          fontweight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomText(
+                          title: 'age'.tr,
+                          fontcolor: AppColor.black121,
+                          fontweight: FontWeight.w700,
+                        ),
+                      ),
+                      CustomFormField(
+                        title: '',
+                        keyboardtype: TextInputType.number,
+                        onchange: (val) {
+                          if (val.toString().isNotEmpty &&
+                              val.length >= 2 &&
+                              registerController.numberRegex.hasMatch(val.toString())) {
+                            registerController.ageValidate.value = true;
+                          } else {
+                            registerController.ageValidate.value = false;
+                          }
+                        },
+                        validator: (val) {
+                          if (val.isEmpty) {
+                            return "required";
+                          }
+                          if (!registerController.numberRegex.hasMatch(val)) {
+                            return "Age should be integer";
+                          }
+                        },
+                        // focusnode: controller.nameFocusNode,
+                        fieldcontroller: registerController.ageController,
+                      ),
+                      SizedBox(
+                        height: context.blockSizeVertical * 5,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25.0,
-              ),
-              child: CustomFormField(
-                title: '',
-                keyboardtype: TextInputType.number,
-                onchange: (val) {
-                  if (val.toString().isNotEmpty &&
-                      val.length >= 2 &&
-                      registerController.numberRegex.hasMatch(val.toString())) {
-                    registerController.ageValidate.value = true;
-                  } else {
-                    registerController.ageValidate.value = false;
-                  }
-                },
-                validator: (val) {
-                  if (val.isEmpty) {
-                    return "required";
-                  }
-                  if (!registerController.numberRegex.hasMatch(val)) {
-                    return "Age should be integer";
-                  }
-                },
-                // focusnode: controller.nameFocusNode,
-                fieldcontroller: registerController.ageController,
-              ),
-            ),
-            SizedBox(
-              height: context.blockSizeVertical * 5,
             ),
             Obx(
               () => registerController.ageValidate.value
-                  ? CustomRoundButton(
-                      title: 'continue'.tr,
-                      onPress: () {
-                        log('Selected Image Path: ${registerController.profilePicturePath.value}');
-                        log('Entered Name: ${registerController.ageController.text}');
+                  ? SafeArea(
+                      child: CustomRoundButton(
+                        title: 'continue'.tr,
+                        onPress: () {
+                          log('Selected Image Path: ${registerController.profilePicturePath.value}');
+                          log('Entered Name: ${registerController.ageController.text}');
 
-                        Get.toNamed(RouteName.registerEmailScreen);
-                      },
+                          Get.toNamed(RouteName.registerEmailScreen);
+                        },
+                      ),
                     )
                   : Center(),
             ),

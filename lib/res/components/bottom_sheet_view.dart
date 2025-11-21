@@ -22,50 +22,52 @@ class BottomSheetView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              headertext == "Correct"
-                  ? AppAssetsImage(
-                      imagePath: ImageAssets.leftFlower,
-                      fit: BoxFit.scaleDown,
-                      width: 45.w,
-                      height: 45.h,
-                    )
-                  : Icon(Icons.warning_outlined, size: 30, color: AppColor.yellowColor),
-              const SizedBox(width: 10),
-              Text(
-                headertext,
-                style: TextStyle(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.w700,
-                  color: color,
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                headertext == "Correct"
+                    ? AppAssetsImage(
+                        imagePath: ImageAssets.leftFlower,
+                        fit: BoxFit.scaleDown,
+                        width: 45.w,
+                        height: 45.h,
+                      )
+                    : Icon(Icons.warning_outlined, size: 30, color: AppColor.yellowColor),
+                const SizedBox(width: 10),
+                Text(
+                  headertext,
+                  style: TextStyle(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              headertext == "Correct"
-                  ? AppAssetsImage(
-                      imagePath: ImageAssets.rightFlower,
-                      fit: BoxFit.scaleDown,
-                      width: 45.w,
-                      height: 45.h,
-                    )
-                  : SizedBox(),
-            ],
-          ),
-          const SizedBox(height: 30),
-          GradientButtonWidget(title: btntext, onTap: btnOntap),
-          const SizedBox(height: 15),
-        ],
+                const SizedBox(width: 10),
+                headertext == "Correct"
+                    ? AppAssetsImage(
+                        imagePath: ImageAssets.rightFlower,
+                        fit: BoxFit.scaleDown,
+                        width: 45.w,
+                        height: 45.h,
+                      )
+                    : SizedBox(),
+              ],
+            ),
+            const SizedBox(height: 30),
+            GradientButtonWidget(title: btntext, onTap: btnOntap),
+            const SizedBox(height: 15),
+          ],
+        ),
       ),
     );
   }

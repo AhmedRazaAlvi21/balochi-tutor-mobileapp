@@ -31,7 +31,6 @@ class RouteName {
   static const String personalInfo = '/personalInfo';
   static const String notifications = '/notifications';
   static const String aboutScreen = '/aboutScreen';
-  static const String privacyPolicyScreen = '/privacyPolicyScreen';
   static const String termsScreen = '/termsScreen';
   static const String subscriptionInfoScreen = '/subscriptionInfoScreen';
   static const String subscriptionPlan = '/subscriptionPlan';

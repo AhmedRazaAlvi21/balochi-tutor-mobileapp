@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../res/assets/AppNetworkImage.dart';
 import '../../../res/assets/image_assets.dart';
 import '../../../res/colors/app_color.dart';
 import '../../../res/components/app_assets_image.dart';
@@ -12,7 +13,7 @@ class CourseCardWidget extends StatelessWidget {
   final String? subTitle;
   final String? lesson;
   final String? words;
-  final String? image;
+  final Widget? image;
   final bool? isLocked;
 
   const CourseCardWidget(
@@ -35,11 +36,7 @@ class CourseCardWidget extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: AppAssetsImage(
-                    imagePath: image ?? ImageAssets.courseImage,
-                    height: 100.h,
-                    width: 100.w,
-                  ),
+                  child: image ?? appNetworkImage(ImageAssets.courseImage, 100.h, 100.w, BoxFit.contain),
                 ),
                 AppAssetsImage(
                   imagePath: isLocked == true ? ImageAssets.lockIcon : ImageAssets.playIcon,
@@ -80,7 +77,7 @@ class CourseCardWidget extends StatelessWidget {
                     height: 5,
                   ),
                   CustomText(
-                    title: lesson ?? "40 Lesson",
+                    title: lesson ?? "50 Lesson",
                     fontcolor: AppColor.blackColor,
                     textalign: TextAlign.left,
                     fontweight: FontWeight.w500,
@@ -91,15 +88,15 @@ class CourseCardWidget extends StatelessWidget {
                   SizedBox(
                     height: 5,
                   ),
-                  CustomText(
-                    title: words ?? "400 words",
-                    fontcolor: AppColor.blackColor,
-                    textalign: TextAlign.left,
-                    fontweight: FontWeight.w500,
-                    fontsize: 12.sp,
-                    maxline: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  // CustomText(
+                  //   title: words ?? "400 words",
+                  //   fontcolor: AppColor.blackColor,
+                  //   textalign: TextAlign.left,
+                  //   fontweight: FontWeight.w500,
+                  //   fontsize: 12.sp,
+                  //   maxline: 3,
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
                 ],
               ),
             ),

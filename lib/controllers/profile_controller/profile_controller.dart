@@ -2,18 +2,18 @@ import 'dart:io';
 
 import 'package:balochi_tutor/models/get_dashboard_model/get_dashboard_response_model.dart';
 import 'package:balochi_tutor/res/routes/routes_name.dart';
+import 'package:balochi_tutor/service/auth_service/logout_service.dart';
 import 'package:balochi_tutor/service/dashboard_service/dashboard_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 import '../../main.dart';
 import '../../models/user_profile_model/user_profile_response_model.dart';
 import '../../res/assets/image_assets.dart';
-import '../../res/colors/app_color.dart';
 import '../../service/user_profile_service/get_user_profile_Service.dart';
 import '../../service/user_profile_service/user_profile_update_service.dart';
+import '../../utils/utils.dart';
 import '../course_controller/course_controller.dart';
 
 class ProfileController extends GetxController with GetSingleTickerProviderStateMixin {
@@ -32,6 +32,8 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   var isDashboardFetched = false.obs;
   DateTime? selectedDate;
   Rx<File?> userImg = Rx<File?>(null);
+  RxBool isLoggingOut = false.obs;
+
   final ImagePicker picker = ImagePicker();
 
   Future<void> pickImage(ImageSource source) async {
@@ -71,8 +73,8 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> _initializeData() async {
-    final context = Get.context!;
-    await getUserProfileData(context);
+    final context = Get.context;
+    await getUserProfileData(context!);
     await getDashboardData(context);
     final courseId = dashboardData.value?.course?.id;
     if (courseId != null) {
@@ -84,10 +86,10 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> getUserProfileData(BuildContext context) async {
-    // if (isDataFetched.value) {
-    //   print("✅ Profile data already fetched — skipping API call");
-    //   return;
-    // }
+    if (isDataFetched.value) {
+      print("✅ Profile data already fetched — skipping API call");
+      return;
+    }
 
     try {
       isLoading.value = true;
@@ -110,7 +112,7 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
           print("🖼️ Profile image URL from API: $imageUrl");
           userProfileData.value?.userImg = imageUrl;
         }
-        // isDataFetched.value = true;
+        isDataFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
         //Utils.toastMessage(context, errorMessage.value, false);
@@ -183,29 +185,41 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
     }
   }
 
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2030),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: AppColor.primaryColor,
-                onPrimary: Colors.white,
-                onSurface: Colors.black,
-              ),
-            ),
-            child: child!,
-          );
-        });
+  void selectDate(BuildContext context) async {
+    final DateTime today = DateTime.now();
+    final DateTime tenYearsAgo = DateTime(today.year - 10, today.month, today.day);
 
-    if (pickedDate != null && pickedDate != selectedDate) {
-      DOBController.text = DateFormat('yyyy-MM-dd').format(pickedDate).toString();
-      update();
-      selectedDate = pickedDate;
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: tenYearsAgo.subtract(const Duration(days: 365 * 10)),
+      firstDate: DateTime(1920),
+      lastDate: tenYearsAgo,
+    );
+
+    if (pickedDate != null) {
+      DOBController.text = "${pickedDate.toLocal()}".split(' ')[0];
+    }
+  }
+
+  Future<bool> userLogout(BuildContext context) async {
+    print("📤 Calling Logout API...");
+    isLoggingOut.value = true;
+
+    try {
+      final response = await LogoutService().callLogoutService(context);
+
+      if (response.responseData?.success == true) {
+        Utils.toastMessage(context, "${response.responseData?.message}", true);
+        return true;
+      } else {
+        Utils.toastMessage(context, response.responseData?.message ?? "Logout failed", false);
+        return false;
+      }
+    } catch (e) {
+      Utils.toastMessage(context, "Logout error", false);
+      return false;
+    } finally {
+      isLoggingOut.value = false; // STOP LOADING
     }
   }
 

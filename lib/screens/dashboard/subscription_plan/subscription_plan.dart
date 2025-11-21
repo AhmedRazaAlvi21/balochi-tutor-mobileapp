@@ -46,24 +46,27 @@ class SubscriptionPlan extends StatelessWidget {
                         fontsize: 20.sp,
                         fontweight: FontWeight.w700,
                       ),
-                      SizedBox(height: 15.h),
+                      SizedBox(height: 5.h),
                       Container(
-                        margin: const EdgeInsets.all(16),
-                        padding: const EdgeInsets.all(16),
+                        margin: EdgeInsets.all(16.w),
+                        padding: EdgeInsets.all(16.w),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               "Choose a subscription plan",
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 10.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5.h),
+                              child: Divider(),
+                            ),
                             ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
@@ -80,8 +83,8 @@ class SubscriptionPlan extends StatelessWidget {
                                     controller.update();
                                   },
                                   child: Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                    margin: EdgeInsets.only(bottom: 10.h),
+                                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
                                     decoration: BoxDecoration(
                                       color: isSelected ? AppColor.whiteColor5 : AppColor.whiteColor,
                                       borderRadius: BorderRadius.circular(15),

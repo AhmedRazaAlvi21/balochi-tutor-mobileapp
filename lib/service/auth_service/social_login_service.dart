@@ -1,3 +1,4 @@
+import 'package:balochi_tutor/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -18,12 +19,13 @@ class SocialLoginService {
         "email": user.email,
         "uuid": user.uid,
         "method": loginMethod ?? "google",
-        "user_img": ""
+        "user_img": "",
+        "device_id": userDeviceId,
       };
 
       debugPrint("google login Request Model: ${loginRequestModel}");
       var response = await Api().postRequest(context, AppUrl.socialLoginApi, loginRequestModel);
-      debugPrint("google login Request Response: $response");
+      debugPrint("google login response Response: $response");
       debugPrint("token: ${response}");
       SocialGoogleLoginResponseModel responseModel = SocialGoogleLoginResponseModel.fromJson(response);
       debugPrint("Parsed ResponseModel: success=${responseModel.success}, statusCode=${responseModel.statusCode}");
