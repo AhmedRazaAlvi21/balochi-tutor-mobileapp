@@ -37,7 +37,7 @@ class DashboardData {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     course = json['course'] != null ? Course.fromJson(json['course']) : null;
     updates = json['updates'] != null ? Updates.fromJson(json['updates']) : null;
-    recentlyDone = json['recently_done'] != null ? RecentlyDone.fromJson(json['recently_done']) : null;
+    recentlyDone = json['recently_done'] != null ? new RecentlyDone.fromJson(json['recently_done']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -62,7 +62,7 @@ class User {
   int? id;
   String? name;
   String? email;
-  int? stripeCustomerId;
+  String? stripeCustomerId;
   String? defaultPaymentMethod;
   String? emailVerifiedAt;
   int? age;
@@ -73,6 +73,10 @@ class User {
   String? userImg;
   String? role;
   String? deviceToken;
+  String? firstDeviceId;
+  String? secondDeviceId;
+  String? secondDeviceToken;
+  int? allowNotifications;
   String? code;
   String? codeGeneratedAt;
   int? verified;
@@ -81,7 +85,7 @@ class User {
   String? country;
   String? phoneNo;
   String? dob;
-  String? userCourseProgress;
+  UserCourseProgress? userCourseProgress;
 
   User(
       {this.id,
@@ -98,6 +102,10 @@ class User {
       this.userImg,
       this.role,
       this.deviceToken,
+      this.firstDeviceId,
+      this.secondDeviceId,
+      this.secondDeviceToken,
+      this.allowNotifications,
       this.code,
       this.codeGeneratedAt,
       this.verified,
@@ -123,6 +131,10 @@ class User {
     userImg = json['user_img'];
     role = json['role'];
     deviceToken = json['device_token'];
+    firstDeviceId = json['first_device_id'];
+    secondDeviceId = json['second_device_id'];
+    secondDeviceToken = json['second_device_token'];
+    allowNotifications = json['allow_notifications'];
     code = json['code'];
     codeGeneratedAt = json['code_generated_at'];
     verified = json['verified'];
@@ -131,7 +143,8 @@ class User {
     country = json['country'];
     phoneNo = json['phone_no'];
     dob = json['dob'];
-    userCourseProgress = json['user_course_progress'];
+    userCourseProgress =
+        json['user_course_progress'] != null ? new UserCourseProgress.fromJson(json['user_course_progress']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -150,6 +163,10 @@ class User {
     data['user_img'] = userImg;
     data['role'] = role;
     data['device_token'] = deviceToken;
+    data['first_device_id'] = firstDeviceId;
+    data['second_device_id'] = secondDeviceId;
+    data['second_device_token'] = secondDeviceToken;
+    data['allow_notifications'] = allowNotifications;
     data['code'] = code;
     data['code_generated_at'] = codeGeneratedAt;
     data['verified'] = verified;
@@ -158,7 +175,44 @@ class User {
     data['country'] = country;
     data['phone_no'] = phoneNo;
     data['dob'] = dob;
-    data['user_course_progress'] = userCourseProgress;
+    if (userCourseProgress != null) {
+      data['user_course_progress'] = userCourseProgress!.toJson();
+    }
+    return data;
+  }
+}
+
+class UserCourseProgress {
+  int? id;
+  int? userId;
+  int? courseId;
+  int? lastCompletedDay;
+  int? currentDay;
+  String? createdAt;
+  String? updatedAt;
+
+  UserCourseProgress(
+      {this.id, this.userId, this.courseId, this.lastCompletedDay, this.currentDay, this.createdAt, this.updatedAt});
+
+  UserCourseProgress.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['user_id'];
+    courseId = json['course_id'];
+    lastCompletedDay = json['last_completed_day'];
+    currentDay = json['current_day'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['user_id'] = userId;
+    data['course_id'] = courseId;
+    data['last_completed_day'] = lastCompletedDay;
+    data['current_day'] = currentDay;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

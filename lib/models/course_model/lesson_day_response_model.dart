@@ -209,65 +209,21 @@ class CourseDay {
 class LessonDayQuiz {
   int? id;
   String? title;
-  String? description;
-  String? status;
-  String? quizType;
-  int? order;
   int? dayAfter;
-  int? duration;
-  int? passingScore;
-  String? difficulty;
-  int? questionsCount;
-  String? createdAt;
-  String? updatedAt;
 
-  LessonDayQuiz({
-    this.id,
-    this.title,
-    this.description,
-    this.status,
-    this.quizType,
-    this.order,
-    this.dayAfter,
-    this.duration,
-    this.passingScore,
-    this.difficulty,
-    this.questionsCount,
-    this.createdAt,
-    this.updatedAt,
-  });
+  LessonDayQuiz({this.id, this.title, this.dayAfter});
 
   LessonDayQuiz.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
-    description = json['description'];
-    status = json['status'];
-    quizType = json['quiz_type'];
-    order = json['order'];
     dayAfter = json['day_after'];
-    duration = json['duration'];
-    passingScore = json['passing_score'];
-    difficulty = json['difficulty'];
-    questionsCount = json['questions_count'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = <String, dynamic>{};
-    map['id'] = id;
-    map['title'] = title;
-    map['description'] = description;
-    map['status'] = status;
-    map['quiz_type'] = quizType;
-    map['order'] = order;
-    map['day_after'] = dayAfter;
-    map['duration'] = duration;
-    map['passing_score'] = passingScore;
-    map['difficulty'] = difficulty;
-    map['questions_count'] = questionsCount;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
-    return map;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['day_after'] = dayAfter;
+    return data;
   }
 }

@@ -55,23 +55,39 @@ class _QuizFillTheBlanksState extends State<QuizFillTheBlanks> {
             onPressed: () => Get.back(),
           ),
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildCapsuleQuestion(currentQuestion.question ?? ""),
-              SizedBox(height: 50.h),
-              _buildCapsuleAnswerField(context, answerController),
-              SizedBox(height: 60.h),
-              SafeArea(
-                child: GradientButtonWidget(
-                  title: currentIndex == widget.fillQuestions.length - 1 ? "Submit" : "Next",
-                  onTap: () => _handleSubmit(context),
-                ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildCapsuleQuestion(currentQuestion.question ?? ""),
+                  SizedBox(height: 50.h),
+                  _buildCapsuleAnswerField(context, answerController),
+                  SizedBox(height: 60.h),
+                  SafeArea(
+                    child: GradientButtonWidget(
+                      title: currentIndex == widget.fillQuestions.length - 1 ? "Submit" : "Next",
+                      onTap: () => _handleSubmit(context),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            // Loading overlay when quiz is being submitted
+            Obx(() {
+              if (controller.isLoading.value) {
+                return Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }),
+          ],
         ),
       ),
     );

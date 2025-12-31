@@ -185,7 +185,7 @@ class RegisterPasswordScreen extends StatelessWidget {
                                     Get.toNamed(RouteName.confirmOtpScreen, arguments: {'isForget': false});
                                   });
                                 } else if (response.responseData?.error != null) {
-                                  Utils.toastMessage(context, "${response.responseData?.error}", false);
+                                  Utils.toastMessage(context, "${response.responseData?.message}", false);
                                 } else {
                                   Utils.toastMessage(context, "Something went wrong", false);
                                 }

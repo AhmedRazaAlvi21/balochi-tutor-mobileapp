@@ -15,6 +15,7 @@ import '../../service/user_profile_service/get_user_profile_Service.dart';
 import '../../service/user_profile_service/user_profile_update_service.dart';
 import '../../utils/utils.dart';
 import '../course_controller/course_controller.dart';
+import '../quiz_controller/quiz_controller.dart';
 
 class ProfileController extends GetxController with GetSingleTickerProviderStateMixin {
   final TextEditingController nameController = TextEditingController();
@@ -26,6 +27,7 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   var dashboardData = Rxn<DashboardData>();
   var userId = 0;
   var isLoading = false.obs;
+  RxBool isUpdatesLoading = false.obs;
 
   var errorMessage = ''.obs;
   var isDataFetched = false.obs;
@@ -77,6 +79,8 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
     await getUserProfileData(context!);
     await getDashboardData(context);
     final courseId = dashboardData.value?.course?.id;
+    debugPrint("course ID ========== $courseId");
+
     if (courseId != null) {
       final courseController = Get.put(CourseController());
       await courseController.getCourseDayData(context);
@@ -86,10 +90,10 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> getUserProfileData(BuildContext context) async {
-    if (isDataFetched.value) {
-      print("✅ Profile data already fetched — skipping API call");
-      return;
-    }
+    // if (isDataFetched.value) {
+    //   print("✅ Profile data already fetched — skipping API call");
+    //   return;
+    // }
 
     try {
       isLoading.value = true;
@@ -125,14 +129,23 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
     }
   }
 
-  Future<void> getDashboardData(BuildContext context) async {
-    // if (isDashboardFetched.value) {
-    //   print("Profile data already fetched — skipping API call");
-    //   return;
-    // }
+  Future<void> getDashboardData(
+    BuildContext context, {
+    bool forceRefresh = false,
+    bool onlyUpdates = false,
+  }) async {
+    if (isDashboardFetched.value && !forceRefresh && !onlyUpdates) {
+      print("Dashboard data already fetched — skipping API call");
+      return;
+    }
 
     try {
-      isLoading.value = true;
+      if (onlyUpdates) {
+        isUpdatesLoading.value = true; // ✅ ONLY updates loader
+      } else {
+        isLoading.value = true; // full page loader (existing)
+      }
+
       errorMessage.value = '';
 
       final response = await DashboardService().callDashboardService(context);
@@ -140,17 +153,19 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         dashboardData.value = response.responseData?.data;
         userId = response.responseData?.data?.course?.id ?? 0;
-        print("user id ================== ${userId}");
         isDashboardFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
-        //Utils.toastMessage(context, errorMessage.value, false);
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      //Utils.toastMessage(context, errorMessage.value, false);
+      debugPrint("❌ Error in getDashboardData: $e");
     } finally {
-      isLoading.value = false;
+      if (onlyUpdates) {
+        isUpdatesLoading.value = false; // ✅ stop updates loader
+      } else {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -201,6 +216,49 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
     }
   }
 
+  /// Clear all user data when logging out or switching users
+  void clearUserData() {
+    debugPrint("🧹 Clearing user data from ProfileController...");
+    // Clear reactive data
+    userProfileData.value = null;
+    dashboardData.value = null;
+    userImg.value = null;
+
+    // Reset flags so data will be fetched fresh for new user
+    isDataFetched.value = false;
+    isDashboardFetched.value = false;
+    isLoading.value = false;
+    errorMessage.value = '';
+
+    // Clear text controllers
+    nameController.clear();
+    phoneNumberController.clear();
+    emailController.clear();
+    CountryController.clear();
+    DOBController.clear();
+
+    // Reset other values
+    userId = 0;
+    selectedDate = null;
+
+    // Clear course and quiz data
+    try {
+      final courseController = Get.find<CourseController>();
+      courseController.clearCourseData();
+    } catch (e) {
+      debugPrint("⚠️ CourseController not found or already cleared: $e");
+    }
+
+    try {
+      final quizController = Get.find<QuizController>();
+      quizController.clearQuizData();
+    } catch (e) {
+      debugPrint("⚠️ QuizController not found or already cleared: $e");
+    }
+
+    debugPrint("✅ User data cleared successfully");
+  }
+
   Future<bool> userLogout(BuildContext context) async {
     print("📤 Calling Logout API...");
     isLoggingOut.value = true;
@@ -209,6 +267,8 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
       final response = await LogoutService().callLogoutService(context);
 
       if (response.responseData?.success == true) {
+        // Clear user data before logout
+        clearUserData();
         Utils.toastMessage(context, "${response.responseData?.message}", true);
         return true;
       } else {
@@ -216,6 +276,8 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
         return false;
       }
     } catch (e) {
+      // Even if logout API fails, clear local data
+      clearUserData();
       Utils.toastMessage(context, "Logout error", false);
       return false;
     } finally {

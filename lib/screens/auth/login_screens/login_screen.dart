@@ -16,7 +16,6 @@ import '../../../res/components/custom_rounded_button.dart';
 import '../../../res/components/custom_text.dart';
 import '../../../res/components/custom_text_button.dart';
 import '../../../res/routes/routes_name.dart';
-import '../../../utils/utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,229 +31,235 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        WillPopScope(
-          onWillPop: () async {
-            return Utils.onwillPopFunc(context);
-          },
-          child: BackgroundWidget(
-            child: SafeArea(
-              child: Scaffold(
-                backgroundColor: Colors.transparent,
-                body: SingleChildScrollView(
-                  child: Obx(
-                    () => Skeletonizer(
-                      enabled: loginController.onLoginLoading.value,
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          children: [
-                            SizedBox(height: 20.w),
-                            AppAssetsImage(
-                              imagePath: ImageAssets.balochiLogo,
-                              fit: BoxFit.scaleDown,
-                              width: 180.w,
-                              height: 180.h,
+        BackgroundWidget(
+          child: SafeArea(
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                leading: InkWell(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: Icon(
+                    Icons.arrow_back,
+                  ),
+                ),
+              ),
+              body: SingleChildScrollView(
+                child: Obx(
+                  () => Skeletonizer(
+                    enabled: loginController.onLoginLoading.value,
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20.w),
+                          AppAssetsImage(
+                            imagePath: ImageAssets.balochiLogo,
+                            fit: BoxFit.scaleDown,
+                            width: 180.w,
+                            height: 180.h,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: CustomText(
+                              title: "Login to Your Account",
+                              fontcolor: AppColor.blackColor,
+                              fontsize: 26.sp,
+                              fontweight: FontWeight.w700,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: CustomText(
-                                title: "Login to Your Account",
-                                fontcolor: AppColor.blackColor,
-                                fontsize: 26.sp,
-                                fontweight: FontWeight.w700,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: CustomFormField(
-                                title: 'Email',
-                                hintStyle: TextStyle(fontSize: 13.sp, color: AppColor.greyColor1),
-                                isFilled: true,
-                                fontsize: 16.sp,
-                                fontColor: AppColor.blackColor,
-                                bgColor: AppColor.whiteColor,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
-                                    width: 0,
-                                  ),
-                                ),
-                                fieldcontroller: loginController.emailController,
-                                onchange: (val) {
-                                  if (val.toString().isNotEmpty && loginController.passwordController.text.isNotEmpty) {
-                                    loginController.loginValidate.value = true;
-                                  } else {
-                                    loginController.loginValidate.value = false;
-                                  }
-                                },
-                                validator: (val) {
-                                  if (val == null || val.trim().isEmpty) {
-                                    return "Email is required";
-                                  }
-                                  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                                  if (!emailRegex.hasMatch(val.trim())) {
-                                    return "Enter a valid email address";
-                                  }
-                                  return null;
-                                },
-                                pIcon: Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Icon(Icons.email, color: AppColor.greyColor1),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: CustomFormField(
+                              title: 'Email',
+                              hintStyle: TextStyle(fontSize: 13.sp, color: AppColor.greyColor1),
+                              isFilled: true,
+                              fontsize: 16.sp,
+                              fontColor: AppColor.blackColor,
+                              bgColor: AppColor.whiteColor,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 0,
                                 ),
                               ),
+                              fieldcontroller: loginController.emailController,
+                              onchange: (val) {
+                                if (val.toString().isNotEmpty && loginController.passwordController.text.isNotEmpty) {
+                                  loginController.loginValidate.value = true;
+                                } else {
+                                  loginController.loginValidate.value = false;
+                                }
+                              },
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return "Email is required";
+                                }
+                                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                                if (!emailRegex.hasMatch(val.trim())) {
+                                  return "Enter a valid email address";
+                                }
+                                return null;
+                              },
+                              pIcon: Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Icon(Icons.email, color: AppColor.greyColor1),
+                              ),
                             ),
-                            SizedBox(
-                              height: context.blockSizeVertical * 2,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: CustomFormField(
-                                title: 'Password',
-                                ispassword: loginController.PasswordVisibility.value,
-                                hintStyle: TextStyle(fontSize: 13.sp, color: AppColor.greyColor1),
-                                isFilled: true,
-                                fontColor: AppColor.blackColor,
-                                fontsize: 16.sp,
-                                bgColor: AppColor.whiteColor,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
-                                    width: 0,
-                                  ),
+                          ),
+                          SizedBox(
+                            height: context.blockSizeVertical * 2,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: CustomFormField(
+                              title: 'Password',
+                              ispassword: loginController.PasswordVisibility.value,
+                              hintStyle: TextStyle(fontSize: 13.sp, color: AppColor.greyColor1),
+                              isFilled: true,
+                              fontColor: AppColor.blackColor,
+                              fontsize: 16.sp,
+                              bgColor: AppColor.whiteColor,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 0,
                                 ),
-                                fieldcontroller: loginController.passwordController,
-                                sIcon: InkWell(
-                                  onTap: () {
-                                    loginController.PasswordVisibility.toggle();
-                                  },
-                                  child: Icon(
-                                    !loginController.PasswordVisibility.value ? Icons.visibility : Icons.visibility_off,
-                                    color: AppColor.greyColor1,
-                                  ),
+                              ),
+                              fieldcontroller: loginController.passwordController,
+                              sIcon: InkWell(
+                                onTap: () {
+                                  loginController.PasswordVisibility.toggle();
+                                },
+                                child: Icon(
+                                  !loginController.PasswordVisibility.value ? Icons.visibility : Icons.visibility_off,
+                                  color: AppColor.greyColor1,
                                 ),
-                                onchange: (val) {
-                                  if (val.toString().isNotEmpty && loginController.emailController.text.isNotEmpty) {
-                                    loginController.loginValidate.value = true;
-                                  } else {
-                                    loginController.loginValidate.value = false;
-                                  }
-                                },
-                                validator: (val) {
-                                  if (val == null || val.trim().isEmpty) {
-                                    return "Password is required";
-                                  }
-                                  if (val.length < 6) {
-                                    return "Password must be at least 6 characters";
-                                  }
-                                  return null;
-                                },
-                                pIcon: Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Icon(
-                                    Icons.lock,
-                                    color: AppColor.greyColor1,
-                                  ),
+                              ),
+                              onchange: (val) {
+                                if (val.toString().isNotEmpty && loginController.emailController.text.isNotEmpty) {
+                                  loginController.loginValidate.value = true;
+                                } else {
+                                  loginController.loginValidate.value = false;
+                                }
+                              },
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) {
+                                  return "Password is required";
+                                }
+                                if (val.length < 6) {
+                                  return "Password must be at least 6 characters";
+                                }
+                                return null;
+                              },
+                              pIcon: Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Icon(
+                                  Icons.lock,
+                                  color: AppColor.greyColor1,
                                 ),
                               ),
                             ),
-                            loginController.loginValidate.value
-                                ? Column(
-                                    children: [
-                                      Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 5.0),
-                                          child: Obx(
-                                            () => CustomCheckBox(
-                                                isChecked: loginController.rememberMe.value,
-                                                onChanged: (val) {
-                                                  loginController.rememberMe.value = val!;
-                                                },
-                                                title: 'remember_me'.tr),
-                                          ),
+                          ),
+                          loginController.loginValidate.value
+                              ? Column(
+                                  children: [
+                                    Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                        child: Obx(
+                                          () => CustomCheckBox(
+                                              isChecked: loginController.rememberMe.value,
+                                              onChanged: (val) {
+                                                loginController.rememberMe.value = val!;
+                                              },
+                                              title: 'remember_me'.tr),
                                         ),
                                       ),
-                                      CustomRoundButton(
-                                        title: 'sign_in'.tr,
-                                        onPress: () async {
-                                          if (formKey.currentState!.validate()) {
-                                            await loginController.userLogin(context);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  )
-                                : Center(),
+                                    ),
+                                    CustomRoundButton(
+                                      title: 'sign_in'.tr,
+                                      onPress: () async {
+                                        if (formKey.currentState!.validate()) {
+                                          await loginController.userLogin(context);
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                )
+                              : Center(),
 
-                            CustomTextButton(
-                              text: 'forgot_password'.tr,
-                              onPressed: () {
-                                Get.toNamed(RouteName.forgotPasswordEmailScreen);
-                              },
-                              fontsize: 16.sp,
-                              fontweight: FontWeight.w600,
+                          CustomTextButton(
+                            text: 'forgot_password'.tr,
+                            onPressed: () {
+                              Get.toNamed(RouteName.forgotPasswordEmailScreen);
+                            },
+                            fontsize: 16.sp,
+                            fontweight: FontWeight.w600,
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0,
+                              ),
+                              child: CustomText(
+                                title: 'or_continue_with'.tr,
+                                fontcolor: AppColor.blackColor,
+                                fontsize: 16.sp,
+                                fontweight: FontWeight.w600,
+                              ),
                             ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20.0,
+                          ),
+                          SizedBox(
+                            height: context.blockSizeVertical * 1,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                CustomAuthWidget(
+                                    iconPath: ImageAssets.google_logo,
+                                    ontap: () {
+                                      loginController.googleAuth(context);
+                                    }),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CustomText(
+                                  title: 'dont_have_account'.tr,
+                                  fontcolor: AppColor.greyColor,
+                                  fontsize: 14.sp,
+                                  fontweight: FontWeight.w500,
                                 ),
-                                child: CustomText(
-                                  title: 'or_continue_with'.tr,
-                                  fontcolor: AppColor.blackColor,
-                                  fontsize: 16.sp,
+                                CustomTextButton(
+                                  text: 'sign_up'.tr,
+                                  onPressed: () {
+                                    // Get.toNamed(RouteName.RegisterNameScreen);
+                                    Get.toNamed(RouteName.signUpScreen);
+                                  },
+                                  fontsize: 14.sp,
                                   fontweight: FontWeight.w600,
                                 ),
-                              ),
+                              ],
                             ),
-                            SizedBox(
-                              height: context.blockSizeVertical * 1,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  CustomAuthWidget(
-                                      iconPath: ImageAssets.google_logo,
-                                      ontap: () {
-                                        loginController.googleAuth(context);
-                                      }),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CustomText(
-                                    title: 'dont_have_account'.tr,
-                                    fontcolor: AppColor.greyColor,
-                                    fontsize: 14.sp,
-                                    fontweight: FontWeight.w500,
-                                  ),
-                                  CustomTextButton(
-                                    text: 'sign_up'.tr,
-                                    onPressed: () {
-                                      // Get.toNamed(RouteName.RegisterNameScreen);
-                                      Get.toNamed(RouteName.signUpScreen);
-                                    },
-                                    fontsize: 14.sp,
-                                    fontweight: FontWeight.w600,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // SizedBox(
-                            //   height: context.orientation == Orientation.portrait
-                            //       ? context.blockSizeVertical * 18
-                            //       : context.blockSizeHorizontal * 7,
-                            // ),
-                          ],
-                        ),
+                          ),
+                          // SizedBox(
+                          //   height: context.orientation == Orientation.portrait
+                          //       ? context.blockSizeVertical * 18
+                          //       : context.blockSizeHorizontal * 7,
+                          // ),
+                        ],
                       ),
                     ),
                   ),

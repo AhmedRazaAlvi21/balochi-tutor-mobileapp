@@ -20,9 +20,11 @@ class PaymentSuccessful extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return Utils.onwillPopFunc(context);
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        await Utils.onwillPopFunc(context);
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,

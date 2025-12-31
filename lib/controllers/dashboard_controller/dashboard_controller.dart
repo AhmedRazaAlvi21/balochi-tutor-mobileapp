@@ -9,8 +9,21 @@ class DashboardController extends GetxController {
   int currentIndex = 0;
   final List<Widget> children = [HomePage(), CourseScreen(), SettingScreen()];
 
+  @override
+  void onInit() {
+    super.onInit();
+    // Always start with Home tab (index 0) when controller is initialized
+    currentIndex = 0;
+  }
+
   void onTabTapped(int index) {
     currentIndex = index;
+    update();
+  }
+
+  /// Reset to Home tab (index 0) - useful when navigating to dashboard after login
+  void resetToHome() {
+    currentIndex = 0;
     update();
   }
 }

@@ -19,10 +19,17 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        BackgroundWidget(
-          child: Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        final controller = Get.find<DashboardController>();
+        controller.onTabTapped(0);
+      },
+      child: Stack(
+        children: [
+          BackgroundWidget(
+            child: Scaffold(
             appBar: AppBar(
               title: CustomText(
                 title: 'Settings'.tr,
@@ -65,8 +72,7 @@ class SettingScreen extends StatelessWidget {
                                           print("Removing token after logout success...");
                                           await SharedPreferencesService().remove(KeysConstant.accessToken);
                                           await Future.delayed(Duration(milliseconds: 200));
-
-                                          Get.offAllNamed(RouteName.loginScreen);
+                                          Get.offAllNamed(RouteName.welcomeScreen);
                                         }
                                       },
 
@@ -121,6 +127,7 @@ class SettingScreen extends StatelessWidget {
               : const SizedBox.shrink();
         })
       ],
+      ),
     );
   }
 }

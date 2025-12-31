@@ -84,10 +84,11 @@ class LessonCompleteScreen extends StatelessWidget {
       }
     });
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
         Get.offAllNamed(RouteName.dashboardScreen);
-        return false;
       },
       child: BackgroundWidget(
         child: Scaffold(

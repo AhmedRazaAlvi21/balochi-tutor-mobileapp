@@ -159,6 +159,7 @@ class QuizScreen extends StatelessWidget {
                       return GradientButtonWidget(
                         title: "Start Quiz",
                         onTap: () {
+                          print("quiz id is =============== $quizId");
                           Get.to(() => StartQuiz(
                                 quizId: quizId,
                                 selectedType: controller.selectedType.value,

@@ -72,6 +72,13 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     );
   }
 
+  bool _isValidVoiceUrl(String? url) {
+    if (url == null) return false;
+    if (url.trim().isEmpty) return false;
+    if (url == "https://balochi.classicprogrammers.com/") return false;
+    return url.endsWith(".mp3") || url.endsWith(".wav") || url.endsWith(".m4a");
+  }
+
   @override
   Widget build(BuildContext context) {
     return BackgroundWidget(
@@ -108,13 +115,29 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // _buildLanguageCard("English", lesson.english ?? "", () {
+                //   courseController.speak(lesson.english ?? "", langType: "English");
+                // }),
                 _buildLanguageCard("English", lesson.english ?? "", () {
-                  courseController.speak(lesson.english ?? "", langType: "English");
+                  courseController.playFromUrlOrTts(
+                    lesson.voiceEnglish,
+                    lesson.english ?? "",
+                    langType: "English",
+                  );
                 }),
+
                 const SizedBox(height: 16),
+                // _buildLanguageCard("Urdu", lesson.urdu ?? "", () {
+                //   courseController.speak(lesson.urdu ?? "", langType: "Urdu");
+                // }, isRtl: true),
                 _buildLanguageCard("Urdu", lesson.urdu ?? "", () {
-                  courseController.speak(lesson.urdu ?? "", langType: "Urdu");
+                  courseController.playFromUrlOrTts(
+                    lesson.voiceUrdu,
+                    lesson.urdu ?? "",
+                    langType: "Urdu",
+                  );
                 }, isRtl: true),
+
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerRight,
@@ -128,8 +151,14 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 ),
                 const SizedBox(height: 16),
                 _buildLanguageCard(selected, balochiText, () {
-                  courseController.speak(balochiText, langType: selected);
+                  String? voiceUrl = selected == "Sulemani dialect" ? lesson.voiceSulemani : lesson.voiceMakrani;
+                  courseController.playFromUrlOrTts(
+                    voiceUrl,
+                    romanText,
+                    langType: selected,
+                  );
                 }, isRtl: true),
+
                 const SizedBox(height: 16),
                 _buildLanguageCard(
                     selected == "Sulemani dialect" ? "Roman Sulemani dialect" : "Roman Makrani dialect", romanText, () {

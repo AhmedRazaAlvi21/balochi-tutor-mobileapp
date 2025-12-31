@@ -42,6 +42,7 @@ dependencies:
   flutter_local_notifications: ^19.5.0
   device_info_plus: ^12.2.0
   flutter_html:
+  audioplayers: ^6.5.1
 
 
 

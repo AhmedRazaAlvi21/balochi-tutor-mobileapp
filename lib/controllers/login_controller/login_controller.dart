@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../auth_repository/social_auth_repository.dart';
 import '../../main.dart';
+import '../../controllers/dashboard_controller/dashboard_controller.dart';
 import '../../res/routes/routes_name.dart';
 import '../../service/auth_service/login-service.dart';
 import '../../service/auth_service/social_login_service.dart';
@@ -40,9 +41,18 @@ class LoginController extends GetxController {
 
           loadingController.setLoading(false);
           if (value.responseData?.statusCode == 200 || value.responseData?.statusCode == 201) {
+            // Clear old user data before navigating to dashboard
+            profileController.clearUserData();
             Utils.toastMessage(context, "Login Successfully", true);
 
             Future.delayed(const Duration(seconds: 2), () {
+              // Reset dashboard to Home tab before navigating
+              try {
+                final dashboardController = Get.find<DashboardController>();
+                dashboardController.resetToHome();
+              } catch (e) {
+                // Controller might not exist yet, it will be created with index 0
+              }
               Get.offAllNamed(RouteName.dashboardScreen);
             });
           } else if (value.responseData?.success == false) {
@@ -73,8 +83,17 @@ class LoginController extends GetxController {
             Get.toNamed(RouteName.confirmOtpScreen, arguments: {'isForget': false});
           });
         } else {
+          // Clear old user data before fetching new user data
+          profileController.clearUserData();
           profileController.getUserProfileData(context);
           Future.delayed(const Duration(seconds: 2), () {
+            // Reset dashboard to Home tab before navigating
+            try {
+              final dashboardController = Get.find<DashboardController>();
+              dashboardController.resetToHome();
+            } catch (e) {
+              // Controller might not exist yet, it will be created with index 0
+            }
             Get.offAllNamed(RouteName.dashboardScreen);
           });
         }

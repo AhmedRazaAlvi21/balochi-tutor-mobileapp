@@ -47,7 +47,7 @@ class CourseCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(width: 10),
+            SizedBox(width: 10.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,59 +57,59 @@ class CourseCardWidget extends StatelessWidget {
                     color: AppColor.whiteColor2,
                     thickness: 2,
                   ),
-                  CustomText(
-                    title: title ?? "Day 1",
-                    fontcolor: AppColor.black121,
-                    textalign: TextAlign.left,
-                    fontsize: 18.sp,
-                    fontweight: FontWeight.w700,
-                    overflow: TextOverflow.ellipsis,
-                    maxline: 1,
-                  ),
-                  CustomText(
-                    title: subTitle ?? "Balochi",
-                    fontcolor: AppColor.black161,
-                    textalign: TextAlign.left,
-                    fontweight: FontWeight.w500,
-                    fontsize: 14.sp,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  CustomText(
-                    title: lesson ?? "50 Lesson",
-                    fontcolor: AppColor.blackColor,
-                    textalign: TextAlign.left,
-                    fontweight: FontWeight.w500,
-                    fontsize: 12.sp,
-                    maxline: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  // CustomText(
-                  //   title: words ?? "400 words",
-                  //   fontcolor: AppColor.blackColor,
-                  //   textalign: TextAlign.left,
-                  //   fontweight: FontWeight.w500,
-                  //   fontsize: 12.sp,
-                  //   maxline: 3,
-                  //   overflow: TextOverflow.ellipsis,
-                  // ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              title: title ?? "Day 1",
+                              fontcolor: AppColor.black121,
+                              textalign: TextAlign.left,
+                              fontsize: 18.sp,
+                              fontweight: FontWeight.w700,
+                              overflow: TextOverflow.ellipsis,
+                              maxline: 1,
+                            ),
+                            CustomText(
+                              title: subTitle ?? "Balochi",
+                              fontcolor: AppColor.black161,
+                              textalign: TextAlign.left,
+                              fontweight: FontWeight.w500,
+                              fontsize: 14.sp,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            CustomText(
+                              title: lesson ?? "50 Lesson",
+                              fontcolor: AppColor.blackColor,
+                              textalign: TextAlign.left,
+                              fontweight: FontWeight.w500,
+                              fontsize: 12.sp,
+                              maxline: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 5.h),
+                      done == true
+                          ? Padding(
+                              padding: EdgeInsets.only(right: 10.w),
+                              child: AppAssetsImage(
+                                imagePath: ImageAssets.done,
+                                height: 46.h,
+                                width: 46.w,
+                              ),
+                            )
+                          : SizedBox.shrink()
+                    ],
+                  )
                 ],
               ),
             ),
-            done == true
-                ? Padding(
-                    padding: EdgeInsets.only(right: 15.w),
-                    child: AppAssetsImage(
-                      imagePath: ImageAssets.done,
-                      height: 46.h,
-                      width: 46.w,
-                    ),
-                  )
-                : SizedBox.shrink()
           ],
         ),
       ),

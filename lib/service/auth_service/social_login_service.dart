@@ -21,6 +21,7 @@ class SocialLoginService {
         "method": loginMethod ?? "google",
         "user_img": "",
         "device_id": userDeviceId,
+        "device_token": deviceToken
       };
 
       debugPrint("google login Request Model: ${loginRequestModel}");

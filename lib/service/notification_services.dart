@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationSetting {
   static final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
+
   static Future<void> initialize() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidInit);
@@ -32,11 +33,19 @@ class NotificationSetting {
 
     // Foreground notification
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final title = message.notification?.title ?? 'New Message';
-      final body = message.notification?.body ?? 'You have a new notification';
+      final title = message.notification?.title;
+      final body = message.notification?.body;
+      if (title == null || body == null || title.isEmpty || body.isEmpty) {
+        debugPrint("⚠️ Foreground notification ignored");
+        return;
+      }
       final payload = jsonEncode(message.data);
-
-      showNotification(id: DateTime.now().millisecondsSinceEpoch ~/ 1000, title: title, body: body, payload: payload);
+      showNotification(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title: title,
+        body: body,
+        payload: payload,
+      );
     });
 
     // Background → tapped
@@ -81,7 +90,7 @@ class NotificationSetting {
       channelDescription: 'Channel for push notifications',
       importance: Importance.max,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
+      icon: '@mipmap/ic_notification',
     );
 
     const details = NotificationDetails(android: androidDetails);

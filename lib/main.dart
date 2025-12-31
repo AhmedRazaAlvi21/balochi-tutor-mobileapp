@@ -26,10 +26,13 @@ import 'my_app.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
-  final title = message.notification?.title ?? "New Message";
-  final body = message.notification?.body ?? "You have a new notification";
-  debugPrint("title ================== $title");
-  debugPrint("body ================== $body");
+  final title = message.notification?.title;
+  final body = message.notification?.body;
+  if (title == null || body == null || title.isEmpty || body.isEmpty) {
+    debugPrint("⚠️ Notification ignored (title/body empty)");
+    return;
+  }
+
   await NotificationSetting.showNotification(
     id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
     title: title,
@@ -52,6 +55,7 @@ void main() async {
   deviceToken = FCMService.deviceToken;
   userDeviceId = await getUserDeviceId();
   debugPrint("USER DEVICE ID (for login restriction): $userDeviceId");
+  debugPrint("USER deviceToken ================= ): $deviceToken");
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,

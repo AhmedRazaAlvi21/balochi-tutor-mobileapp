@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../../controllers/profile_controller/profile_controller.dart';
 import '../../../../res/assets/image_assets.dart';
 import '../../../../res/colors/app_color.dart';
 import '../../../../res/components/app_assets_image.dart';
@@ -25,35 +26,47 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    final ProfileController profileController = Get.find<ProfileController>();
+
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {},
       child: BackgroundWidget(
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: _buildAppBar(),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _ResultCard(
-                    passed: passed,
-                    score: score,
-                    totalQuestions: totalQuestions,
-                    correctAnswers: correctAnswers,
-                  ),
-                  SizedBox(height: 30.h),
-                  SafeArea(
-                    child: GradientButtonWidget(
-                      title: passed ? "Done" : "Continue",
-                      onTap: () => Get.offAllNamed(RouteName.dashboardScreen),
+          body: Obx(() {
+            // Show loading indicator when dashboard data is being refreshed
+            if (profileController.isLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            return SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _ResultCard(
+                      passed: passed,
+                      score: score,
+                      totalQuestions: totalQuestions,
+                      correctAnswers: correctAnswers,
                     ),
-                  ),
-                ],
+                    SizedBox(height: 30.h),
+                    SafeArea(
+                      child: GradientButtonWidget(
+                        title: passed ? "Done" : "Continue",
+                        onTap: () => Get.offAllNamed(RouteName.dashboardScreen),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ),
       ),
     );
