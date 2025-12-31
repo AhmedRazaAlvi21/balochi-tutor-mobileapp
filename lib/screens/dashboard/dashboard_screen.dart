@@ -16,17 +16,22 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return Utils.onwillPopFunc(context);
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final controller = Get.find<DashboardController>();
+        if (controller.currentIndex == 0) {
+          await Utils.onwillPopFunc(context);
+        } else {
+          controller.onTabTapped(0);
+        }
       },
       child: GetBuilder<DashboardController>(
           init: DashboardController(),
           builder: (controller) {
             return BackgroundWidget(
-              // painter: LanguageLearningBackgroundPainter(),
               child: Scaffold(
-                //backgroundColor: AppColor.primaryColor,
                 body: controller.children[controller.currentIndex],
                 bottomNavigationBar: SafeArea(
                   child: Container(

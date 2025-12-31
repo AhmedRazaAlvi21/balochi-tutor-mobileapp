@@ -3,23 +3,40 @@ import 'package:balochi_tutor/res/colors/app_color.dart';
 import 'package:balochi_tutor/res/components/background_widget.dart';
 import 'package:balochi_tutor/res/components/bottom_sheet_view.dart';
 import 'package:balochi_tutor/res/components/gradientButtonWidget/gradient_button_widget.dart';
+import 'package:balochi_tutor/res/components/gradientButtonWidget/gradient_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../../res/components/gradientButtonWidget/gradient_text_widget.dart';
-
-class QuizFillTheBlanks extends StatelessWidget {
-  final List fillQuestions; // list of Fillquestions objects
+class QuizFillTheBlanks extends StatefulWidget {
+  final List fillQuestions;
 
   const QuizFillTheBlanks({super.key, required this.fillQuestions});
 
   @override
+  State<QuizFillTheBlanks> createState() => _QuizFillTheBlanksState();
+}
+
+class _QuizFillTheBlanksState extends State<QuizFillTheBlanks> {
+  final QuizController controller = Get.find<QuizController>();
+  late TextEditingController answerController;
+  int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    answerController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    answerController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final QuizController controller = Get.find<QuizController>();
-    final Map<int, TextEditingController> textControllers = {
-      for (var q in fillQuestions) (q.id ?? 0): TextEditingController()
-    };
+    final currentQuestion = widget.fillQuestions[currentIndex];
 
     return BackgroundWidget(
       child: Scaffold(
@@ -38,79 +55,90 @@ class QuizFillTheBlanks extends StatelessWidget {
             onPressed: () => Get.back(),
           ),
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              for (var q in fillQuestions) ...[
-                SizedBox(height: 25.h),
-                _buildCapsuleQuestion(q.question ?? ""),
-                SizedBox(height: 40.h),
-                _buildCapsuleAnswerField(
-                  context,
-                  textControllers[q.id]!,
-                ),
-                SizedBox(height: 30.h),
-              ],
-              SizedBox(height: 50.h),
-              GradientButtonWidget(
-                title: "Submit Answers",
-                onTap: () {
-                  final Map<String, dynamic> answers = {};
-
-                  for (var q in fillQuestions) {
-                    final id = q.id.toString();
-                    final text = textControllers[q.id]?.text.trim() ?? "";
-
-                    if (text.isEmpty) {
-                      Get.snackbar("Incomplete", "Please fill all blanks before submitting.",
-                          backgroundColor: Colors.redAccent, colorText: Colors.white);
-                      return;
-                    }
-
-                    answers[id] = text;
-                  }
-
-                  controller.answers.addAll(answers);
-
-                  bool allCorrect = true;
-                  for (var q in fillQuestions) {
-                    String filled = textControllers[q.id]?.text.trim().toLowerCase() ?? "";
-                    String correct = (q.answer ?? "").toString().toLowerCase();
-                    if (filled != correct) {
-                      allCorrect = false;
-                      break;
-                    }
-                  }
-
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => BottomSheetView(
-                      color: allCorrect ? Colors.green : Colors.red,
-                      headertext: allCorrect ? 'All Correct!' : 'Some Wrong',
-                      btntext: "Finish",
-                      btnOntap: () {
-                        Get.back();
-                        controller.submitQuiz(context);
-                      },
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildCapsuleQuestion(currentQuestion.question ?? ""),
+                  SizedBox(height: 50.h),
+                  _buildCapsuleAnswerField(context, answerController),
+                  SizedBox(height: 60.h),
+                  SafeArea(
+                    child: GradientButtonWidget(
+                      title: currentIndex == widget.fillQuestions.length - 1 ? "Submit" : "Next",
+                      onTap: () => _handleSubmit(context),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-              SizedBox(height: 40.h),
-            ],
-          ),
+            ),
+            // Loading overlay when quiz is being submitted
+            Obx(() {
+              if (controller.isLoading.value) {
+                return Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }),
+          ],
         ),
+      ),
+    );
+  }
+
+  void _handleSubmit(BuildContext context) {
+    final text = answerController.text.trim();
+    if (text.isEmpty) {
+      Get.snackbar("Incomplete", "Please fill the blank before continuing.",
+          backgroundColor: Colors.redAccent, colorText: Colors.white);
+      return;
+    }
+
+    final currentQuestion = widget.fillQuestions[currentIndex];
+    final correctAnswer = (currentQuestion.answer ?? "").toString().trim();
+
+    // store answer
+    controller.answers[currentQuestion.id.toString()] = text;
+
+    bool isCorrect = text.toLowerCase() == correctAnswer.toLowerCase();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BottomSheetView(
+        color: isCorrect ? Colors.green : Colors.red,
+        headertext: isCorrect ? 'Correct!' : 'Wrong',
+        btntext: currentIndex == widget.fillQuestions.length - 1 ? "Finish" : "Next",
+        btnOntap: () {
+          Get.back();
+
+          if (currentIndex < widget.fillQuestions.length - 1) {
+            // Move to next question
+            setState(() {
+              currentIndex++;
+              answerController.clear();
+            });
+          } else {
+            // All done — go to result
+            controller.submitQuiz(context);
+          }
+        },
       ),
     );
   }
 
   Widget _buildCapsuleQuestion(String question) {
     return GradientTextWidget(
-      width: 230.w,
+      width: 260.w,
+      padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 15.h),
       child: Text(
         question,
         style: TextStyle(
@@ -125,7 +153,7 @@ class QuizFillTheBlanks extends StatelessWidget {
 
   Widget _buildCapsuleAnswerField(BuildContext context, TextEditingController controller) {
     return GradientTextWidget(
-      width: MediaQuery.of(context).size.width * 0.7,
+      width: MediaQuery.of(context).size.width * 0.75,
       child: TextField(
         controller: controller,
         textAlign: TextAlign.center,

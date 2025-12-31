@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
             ignoreContainers: false,
           ),
           child: GetMaterialApp(
-            title: 'app_name'.tr,
+            title: 'Balochi Tutor',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               useMaterial3: true,

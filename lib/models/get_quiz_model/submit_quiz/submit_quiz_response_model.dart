@@ -2,14 +2,16 @@ class SubmitQuizResponseModel {
   bool? success;
   ResultData? data;
   String? type;
+  String? message;
   int? code;
 
-  SubmitQuizResponseModel({this.success, this.data, this.type, this.code});
+  SubmitQuizResponseModel({this.success, this.data, this.type, this.message, this.code});
 
   SubmitQuizResponseModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? ResultData.fromJson(json['data']) : null;
     type = json['type'];
+    type = json['message'];
     code = json['code'];
   }
 
@@ -20,6 +22,7 @@ class SubmitQuizResponseModel {
       data['data'] = this.data!.toJson();
     }
     data['type'] = type;
+    data['message'] = message;
     data['code'] = code;
     return data;
   }

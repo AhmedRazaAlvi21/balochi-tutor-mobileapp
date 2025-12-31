@@ -2,19 +2,20 @@ import 'dart:io';
 
 import 'package:balochi_tutor/models/get_dashboard_model/get_dashboard_response_model.dart';
 import 'package:balochi_tutor/res/routes/routes_name.dart';
+import 'package:balochi_tutor/service/auth_service/logout_service.dart';
 import 'package:balochi_tutor/service/dashboard_service/dashboard_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 import '../../main.dart';
 import '../../models/user_profile_model/user_profile_response_model.dart';
 import '../../res/assets/image_assets.dart';
-import '../../res/colors/app_color.dart';
 import '../../service/user_profile_service/get_user_profile_Service.dart';
 import '../../service/user_profile_service/user_profile_update_service.dart';
+import '../../utils/utils.dart';
 import '../course_controller/course_controller.dart';
+import '../quiz_controller/quiz_controller.dart';
 
 class ProfileController extends GetxController with GetSingleTickerProviderStateMixin {
   final TextEditingController nameController = TextEditingController();
@@ -26,12 +27,15 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   var dashboardData = Rxn<DashboardData>();
   var userId = 0;
   var isLoading = false.obs;
+  RxBool isUpdatesLoading = false.obs;
 
   var errorMessage = ''.obs;
   var isDataFetched = false.obs;
   var isDashboardFetched = false.obs;
   DateTime? selectedDate;
   Rx<File?> userImg = Rx<File?>(null);
+  RxBool isLoggingOut = false.obs;
+
   final ImagePicker picker = ImagePicker();
 
   Future<void> pickImage(ImageSource source) async {
@@ -71,10 +75,12 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
   }
 
   Future<void> _initializeData() async {
-    final context = Get.context!;
-    await getUserProfileData(context);
+    final context = Get.context;
+    await getUserProfileData(context!);
     await getDashboardData(context);
     final courseId = dashboardData.value?.course?.id;
+    debugPrint("course ID ========== $courseId");
+
     if (courseId != null) {
       final courseController = Get.put(CourseController());
       await courseController.getCourseDayData(context);
@@ -110,7 +116,7 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
           print("🖼️ Profile image URL from API: $imageUrl");
           userProfileData.value?.userImg = imageUrl;
         }
-        // isDataFetched.value = true;
+        isDataFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
         //Utils.toastMessage(context, errorMessage.value, false);
@@ -123,14 +129,23 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
     }
   }
 
-  Future<void> getDashboardData(BuildContext context) async {
-    // if (isDashboardFetched.value) {
-    //   print("Profile data already fetched — skipping API call");
-    //   return;
-    // }
+  Future<void> getDashboardData(
+    BuildContext context, {
+    bool forceRefresh = false,
+    bool onlyUpdates = false,
+  }) async {
+    if (isDashboardFetched.value && !forceRefresh && !onlyUpdates) {
+      print("Dashboard data already fetched — skipping API call");
+      return;
+    }
 
     try {
-      isLoading.value = true;
+      if (onlyUpdates) {
+        isUpdatesLoading.value = true; // ✅ ONLY updates loader
+      } else {
+        isLoading.value = true; // full page loader (existing)
+      }
+
       errorMessage.value = '';
 
       final response = await DashboardService().callDashboardService(context);
@@ -138,17 +153,19 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
       if (response.responseData?.code == 200 || response.responseData?.code == 201) {
         dashboardData.value = response.responseData?.data;
         userId = response.responseData?.data?.course?.id ?? 0;
-        print("user id ================== ${userId}");
         isDashboardFetched.value = true;
       } else {
         errorMessage.value = response.responseData?.message ?? 'Something went wrong';
-        //Utils.toastMessage(context, errorMessage.value, false);
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      //Utils.toastMessage(context, errorMessage.value, false);
+      debugPrint("❌ Error in getDashboardData: $e");
     } finally {
-      isLoading.value = false;
+      if (onlyUpdates) {
+        isUpdatesLoading.value = false; // ✅ stop updates loader
+      } else {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -183,29 +200,88 @@ class ProfileController extends GetxController with GetSingleTickerProviderState
     }
   }
 
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2030),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: AppColor.primaryColor,
-                onPrimary: Colors.white,
-                onSurface: Colors.black,
-              ),
-            ),
-            child: child!,
-          );
-        });
+  void selectDate(BuildContext context) async {
+    final DateTime today = DateTime.now();
+    final DateTime tenYearsAgo = DateTime(today.year - 10, today.month, today.day);
 
-    if (pickedDate != null && pickedDate != selectedDate) {
-      DOBController.text = DateFormat('yyyy-MM-dd').format(pickedDate).toString();
-      update();
-      selectedDate = pickedDate;
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: tenYearsAgo.subtract(const Duration(days: 365 * 10)),
+      firstDate: DateTime(1920),
+      lastDate: tenYearsAgo,
+    );
+
+    if (pickedDate != null) {
+      DOBController.text = "${pickedDate.toLocal()}".split(' ')[0];
+    }
+  }
+
+  /// Clear all user data when logging out or switching users
+  void clearUserData() {
+    debugPrint("🧹 Clearing user data from ProfileController...");
+    // Clear reactive data
+    userProfileData.value = null;
+    dashboardData.value = null;
+    userImg.value = null;
+
+    // Reset flags so data will be fetched fresh for new user
+    isDataFetched.value = false;
+    isDashboardFetched.value = false;
+    isLoading.value = false;
+    errorMessage.value = '';
+
+    // Clear text controllers
+    nameController.clear();
+    phoneNumberController.clear();
+    emailController.clear();
+    CountryController.clear();
+    DOBController.clear();
+
+    // Reset other values
+    userId = 0;
+    selectedDate = null;
+
+    // Clear course and quiz data
+    try {
+      final courseController = Get.find<CourseController>();
+      courseController.clearCourseData();
+    } catch (e) {
+      debugPrint("⚠️ CourseController not found or already cleared: $e");
+    }
+
+    try {
+      final quizController = Get.find<QuizController>();
+      quizController.clearQuizData();
+    } catch (e) {
+      debugPrint("⚠️ QuizController not found or already cleared: $e");
+    }
+
+    debugPrint("✅ User data cleared successfully");
+  }
+
+  Future<bool> userLogout(BuildContext context) async {
+    print("📤 Calling Logout API...");
+    isLoggingOut.value = true;
+
+    try {
+      final response = await LogoutService().callLogoutService(context);
+
+      if (response.responseData?.success == true) {
+        // Clear user data before logout
+        clearUserData();
+        Utils.toastMessage(context, "${response.responseData?.message}", true);
+        return true;
+      } else {
+        Utils.toastMessage(context, response.responseData?.message ?? "Logout failed", false);
+        return false;
+      }
+    } catch (e) {
+      // Even if logout API fails, clear local data
+      clearUserData();
+      Utils.toastMessage(context, "Logout error", false);
+      return false;
+    } finally {
+      isLoggingOut.value = false; // STOP LOADING
     }
   }
 

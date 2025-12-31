@@ -11,6 +11,11 @@ class DashboardService {
     try {
       var response = await Api().getRequest(context, AppUrl.dashboardApi, sendToken: true);
       debugPrint("Dashboard Response: $response");
+      // Ensure we only try to parse valid JSON maps
+      if (response is! Map<String, dynamic>) {
+        debugPrint("❌ Unexpected dashboard response format (not a JSON map)");
+        return ApiCallResponse.error('Invalid dashboard response format');
+      }
       GetDashboardDataResponseModel responseModel = GetDashboardDataResponseModel.fromJson(response);
       debugPrint("Dashboard Response Model: ${responseModel.toJson()}");
       return ApiCallResponse.completed(responseModel);

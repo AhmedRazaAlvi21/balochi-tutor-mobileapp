@@ -129,7 +129,7 @@ class RegisterController extends GetxController {
             Get.toNamed(RouteName.createNewPasswordScreen);
           });
         } else {
-          Utils.toastMessage(context, response.responseData?.message ?? "OTP Verified", true);
+          Utils.toastMessage(context, "Registered successfully", true);
           Future.delayed(const Duration(seconds: 2), () {
             Get.toNamed(RouteName.loginScreen);
           });

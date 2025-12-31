@@ -12,7 +12,11 @@ class SignupService {
   Future<ApiCallResponse<SignupResponseModel>> callSignupService(BuildContext context, bool signupProfile) async {
     try {
       FormData formData = FormData.fromMap({
-        'name': signupProfile ? registerController.nameController.text : registerController.defaultName.value,
+        'name': signupProfile 
+            ? registerController.nameController.text.trim() 
+            : (registerController.nameController.text.trim().isNotEmpty 
+                ? registerController.nameController.text.trim() 
+                : registerController.defaultName.value),
         'age': signupProfile ? registerController.ageController.text : "",
         'email': signupProfile
             ? registerController.emailController.text.trim()

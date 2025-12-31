@@ -21,8 +21,12 @@ class ConfirmOtpScreen extends StatelessWidget {
     final registerController = Get.put(RegisterController());
     registerController.initOtpController(Get.arguments as Map<String, dynamic>?, context);
 
-    return WillPopScope(
-      onWillPop: () async => Utils.onwillPopFunc(context),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        await Utils.onwillPopFunc(context);
+      },
       child: BackgroundWidget(
         child: Scaffold(
           backgroundColor: Colors.transparent,

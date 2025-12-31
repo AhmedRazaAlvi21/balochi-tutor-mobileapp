@@ -52,6 +52,7 @@ class _LessonScreenState extends State<LessonScreen> {
     ScreenProtector.preventScreenshotOff();
     ScreenProtector.protectDataLeakageOff();
     courseController.isLessonDayDataFetched.value = false;
+    // Don't dispose scroll controller here - it's managed by CourseController
     super.dispose();
   }
 
@@ -106,7 +107,7 @@ class _LessonScreenState extends State<LessonScreen> {
                       color: AppColor.greyColor,
                     ),
                     items: (filter, _) {
-                      final list = courseController.lessonDaysData.value ?? [];
+                      final list = courseController.lessonDaysData.toList();
                       final allTitles = list
                           .where((c) => c.title?.toLowerCase().contains(filter.toLowerCase()) ?? false)
                           .map((c) => c.title ?? "")
@@ -151,6 +152,7 @@ class _LessonScreenState extends State<LessonScreen> {
                         }
 
                         return ListView.builder(
+                          controller: courseController.lessonScreenScrollController,
                           itemCount: lessons.length,
                           itemBuilder: (context, index) {
                             final lesson = lessons[index];
@@ -160,7 +162,7 @@ class _LessonScreenState extends State<LessonScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.white,
-                                border: status == "resume" ? Border.all(color: Colors.deepPurple, width: 1.5) : null,
+                                //border: status == "resume" ? Border.all(color: Colors.deepPurple, width: 1.5) : null,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.05),
@@ -171,18 +173,24 @@ class _LessonScreenState extends State<LessonScreen> {
                               ),
                               child: ListTile(
                                 onTap: () {
+                                  // Save scroll position before navigating
+                                  courseController.saveLessonScrollPosition();
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => LessonContentScreen(lessonId: lesson.id),
+                                      builder: (context) =>
+                                          LessonContentScreen(lessonId: lesson.id, order: lesson.order),
                                     ),
-                                  );
+                                  ).then((_) {
+                                    // Restore scroll position when coming back
+                                    courseController.restoreLessonScrollPosition();
+                                  });
                                 },
                                 contentPadding: const EdgeInsets.only(left: 12, right: 12),
                                 leading: AppAssetsImage(
                                   imagePath: ImageAssets.pencilPaper,
                                   fit: BoxFit.scaleDown,
-                                  color: status == "resume" ? null : AppColor.black72C,
+                                  color: AppColor.black72C,
                                   width: 18.w,
                                   height: 20.h,
                                 ),
@@ -242,7 +250,7 @@ class _LessonScreenState extends State<LessonScreen> {
                           fontweight: FontWeight.w700,
                         ),
                         CustomText(
-                          title: courseController.errorMessage.value ?? "",
+                          title: courseController.errorMessage.value,
                           fontcolor: AppColor.blackColor,
                           fontsize: 14.sp,
                           fontweight: FontWeight.w400,
@@ -252,8 +260,43 @@ class _LessonScreenState extends State<LessonScreen> {
                           width: 150.w,
                           padding: EdgeInsets.zero,
                           title: "Quiz",
-                          onTap: () {
-                            Get.to(() => QuizScreen(quizId: courseController.quizId));
+                          onTap: () async {
+                            // First, fetch the quiz ID for this course day
+                            if (widget.courseId != null && widget.courseId! > 0) {
+                              final actualQuizId =
+                                  await courseController.getQuizIdForCourseDay(context, widget.courseId!);
+                              debugPrint(
+                                  "🔍 Quiz ID fetched in LessonScreen: $actualQuizId for course day: ${widget.courseId}");
+
+                              if (actualQuizId > 0) {
+                                await Get.to(() => QuizScreen(quizId: actualQuizId));
+                                // Refresh lesson days data after quiz completion
+                                courseController.isLessonDayDataFetched.value = false;
+                                await courseController.getLessonDaysData(context, widget.courseId!, forceRefresh: true);
+                              } else {
+                                Get.snackbar(
+                                  "Error",
+                                  "Quiz not available for this day",
+                                  backgroundColor: AppColor.redColor,
+                                  colorText: Colors.white,
+                                );
+                              }
+                            } else {
+                              // Fallback to using the quizId from controller if courseId is not available
+                              if (courseController.quizId > 0) {
+                                await Get.to(() => QuizScreen(quizId: courseController.quizId));
+                                courseController.isLessonDayDataFetched.value = false;
+                                await courseController.getLessonDaysData(context, widget.courseId ?? 0,
+                                    forceRefresh: true);
+                              } else {
+                                Get.snackbar(
+                                  "Error",
+                                  "Quiz not available",
+                                  backgroundColor: AppColor.redColor,
+                                  colorText: Colors.white,
+                                );
+                              }
+                            }
                           },
                         ),
                       ],

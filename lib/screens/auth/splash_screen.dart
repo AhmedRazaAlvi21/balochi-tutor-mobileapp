@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/dashboard_controller/dashboard_controller.dart';
 import '../../res/assets/image_assets.dart';
 import '../../res/colors/app_color.dart';
 import '../../res/components/app_assets_image.dart';
@@ -29,6 +30,13 @@ class _SplashScreenState extends State<SplashScreen> {
       String? token = await SharedPreferencesService().getString(KeysConstant.accessToken);
       print("login token =============== $token");
       if (token != null && token.isNotEmpty) {
+        // Reset dashboard to Home tab before navigating
+        try {
+          final dashboardController = Get.find<DashboardController>();
+          dashboardController.resetToHome();
+        } catch (e) {
+          // Controller might not exist yet, it will be created with index 0
+        }
         Get.offAllNamed(RouteName.dashboardScreen);
       } else {
         Get.toNamed(RouteName.welcomeScreen);

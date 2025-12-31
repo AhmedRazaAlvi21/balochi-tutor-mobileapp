@@ -78,7 +78,7 @@ class Languages extends Translations {
           'phone_screen_text': "What is your phone number? ✉️ ",
           'email': "Email",
           'phone': "Phone",
-          "areYouSureYouWantToExit": "Are you sure.\nwant to exit Balochi?",
+          "areYouSureYouWantToExit": "Do you want to exit the app?",
           "yes": "Yes",
           "no": "No",
           'password_screen_text': "Create a password 🔐",

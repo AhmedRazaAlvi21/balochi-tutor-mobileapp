@@ -41,7 +41,8 @@ class StartQuiz extends StatelessWidget {
           ),
         ),
         body: Obx(() {
-          if (controller.isLoading.value) {
+          // Initial loading - when quiz data is being fetched
+          if (controller.isLoading.value && controller.quizData.value == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -66,74 +67,88 @@ class StartQuiz extends StatelessWidget {
           String buttonText =
               isLastQuestion ? ((quiz.fillquestions?.isNotEmpty ?? false) ? "Next Section" : "Finish") : "Next";
 
-          return Column(
+          return Stack(
             children: [
-              SizedBox(height: 20.h),
-              GradientTextWidget(
-                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
-                child: Text(
-                  currentQuestion.question ?? "",
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.black242,
+              Column(
+                children: [
+                  SizedBox(height: 20.h),
+                  GradientTextWidget(
+                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
+                    child: Text(
+                      currentQuestion.question ?? "",
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.black242,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: 30.h),
+                  SizedBox(height: 30.h),
 
-              // --- Options List ---
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(options.length, (index) {
-                      bool isSelected = controller.selectedIndex.value == index;
-                      return GestureDetector(
-                        onTap: () {
-                          int questionId =
-                              controller.quizData.value?.questions?[controller.currentQuestionIndex.value].id ?? 0;
-                          controller.selectOption(
-                            questionId,
-                            index + 1, // the selected answer value (e.g., option number)
-                            index, // to highlight UI
-                          );
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 30.w),
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 20.h),
-                            child: GradientTextWidget(
-                              width: 230.w,
-                              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
-                              gradientColors: isSelected
-                                  ? AppColor.gradientButton
-                                  : AppColor.gradientButton.map((c) => c.withOpacity(0.4)).toList(),
-                              child: Text(
-                                options[index],
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColor.black242,
+                  // --- Options List ---
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: List.generate(options.length, (index) {
+                          bool isSelected = controller.selectedIndex.value == index;
+                          return GestureDetector(
+                            onTap: () {
+                              int questionId =
+                                  controller.quizData.value?.questions?[controller.currentQuestionIndex.value].id ?? 0;
+                              controller.selectOption(
+                                questionId,
+                                index, // the selected answer value (e.g., option number)
+                                index, // to highlight UI
+                              );
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 30.w),
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 20.h),
+                                child: GradientTextWidget(
+                                  width: 230.w,
+                                  padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
+                                  gradientColors: isSelected
+                                      ? AppColor.gradientButton
+                                      : AppColor.gradientButton.map((c) => c.withOpacity(0.4)).toList(),
+                                  child: Text(
+                                    options[index],
+                                    style: TextStyle(
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColor.black242,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    }),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+
+                  SafeArea(
+                    child: GradientButtonWidget(
+                      title: buttonText,
+                      onTap: () {
+                        _onSubmit(context, controller, correctIndex);
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 30.h),
+                ],
+              ),
+              // Loading overlay when quiz is being submitted
+              if (controller.isLoading.value)
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
                   ),
                 ),
-              ),
-
-              GradientButtonWidget(
-                title: buttonText,
-                onTap: () {
-                  _onSubmit(context, controller, correctIndex);
-                },
-              ),
-              SizedBox(height: 30.h),
             ],
           );
         }),
@@ -148,7 +163,9 @@ class StartQuiz extends StatelessWidget {
       return;
     }
 
-    bool isCorrect = controller.selectedIndex.value == (correctIndex - 1);
+    bool isCorrect = controller.selectedIndex.value == correctIndex;
+
+    print("iscorrect ========== $isCorrect");
     final quiz = controller.quizData.value!;
 
     showModalBottomSheet(
